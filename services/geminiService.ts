@@ -446,7 +446,7 @@ export const gradeWritingResponse = async (task: WritingTask, userResponse: stri
       
       **Output**:
       1. Estimated Scaled Score (0-5).
-      2. Actionable Feedback in Japanese (Start with "Good points", then "Improvements").
+      2. Actionable Feedback in Japanese (Start DIRECTLY with "Good points" or feedback content, NO greeting phrases).
     `;
 
     const response = await ai.models.generateContent({
@@ -465,7 +465,24 @@ export const gradeWritingResponse = async (task: WritingTask, userResponse: stri
         }
     });
 
-    return JSON.parse(response.text!);
+    const result = JSON.parse(response.text!);
+    
+    // Remove greeting phrases from feedback
+    const greetingPatterns = [
+      /^はい、承知しました。\s*/,
+      /^はい、わかりました。\s*/,
+      /^承知しました。\s*/,
+      /^かしこまりました。\s*/,
+      /^了解しました。\s*/,
+    ];
+    
+    for (const pattern of greetingPatterns) {
+      result.feedback = result.feedback.replace(pattern, '');
+    }
+    
+    result.feedback = result.feedback.trim();
+    
+    return result;
 };
 
 export const gradeSpeakingResponse = async (task: SpeakingTask, transcript: string): Promise<{ score: number, feedback: string }> => {
@@ -492,7 +509,7 @@ export const gradeSpeakingResponse = async (task: SpeakingTask, transcript: stri
       
       **Output**:
       1. Estimated Score (0-4).
-      2. Actionable Feedback in Japanese (Focus on template usage and signal words).
+      2. Actionable Feedback in Japanese (Start DIRECTLY with feedback content, NO greeting phrases like "はい、承知しました。").
     `;
 
     const response = await ai.models.generateContent({
@@ -511,7 +528,24 @@ export const gradeSpeakingResponse = async (task: SpeakingTask, transcript: stri
         }
     });
 
-    return JSON.parse(response.text!);
+    const result = JSON.parse(response.text!);
+    
+    // Remove greeting phrases from feedback
+    const greetingPatterns = [
+      /^はい、承知しました。\s*/,
+      /^はい、わかりました。\s*/,
+      /^承知しました。\s*/,
+      /^かしこまりました。\s*/,
+      /^了解しました。\s*/,
+    ];
+    
+    for (const pattern of greetingPatterns) {
+      result.feedback = result.feedback.replace(pattern, '');
+    }
+    
+    result.feedback = result.feedback.trim();
+    
+    return result;
 };
 
 export const generatePerformanceAnalysis = async (
@@ -539,7 +573,22 @@ export const generatePerformanceAnalysis = async (
     model: MODEL_NAME,
     contents: prompt,
   });
-  return response.text || "解析できませんでした。";
+  
+  // Remove greeting phrases like "はい、承知しました。" from the beginning
+  let analysis = response.text || "解析できませんでした。";
+  const greetingPatterns = [
+    /^はい、承知しました。\s*/,
+    /^はい、わかりました。\s*/,
+    /^承知しました。\s*/,
+    /^かしこまりました。\s*/,
+    /^了解しました。\s*/,
+  ];
+  
+  for (const pattern of greetingPatterns) {
+    analysis = analysis.replace(pattern, '');
+  }
+  
+  return analysis.trim();
 }
 
 export const generateHistoryAnalysis = async (history: PerformanceRecord[]): Promise<string> => {

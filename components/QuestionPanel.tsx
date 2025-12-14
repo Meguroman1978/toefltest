@@ -95,28 +95,90 @@ const QuestionPanel: React.FC<QuestionPanelProps> = ({
   const renderInsertText = () => {
       const selectedIndex = currentAnswer.length > 0 ? parseInt(currentAnswer[0], 10) : -1;
       
-      const labels = ["First square", "Second square", "Third square", "Fourth square"];
-      const selectedLabel = selectedIndex >= 0 && selectedIndex < labels.length 
-          ? labels[selectedIndex] 
-          : "None selected";
+      const positions = [
+        { label: "Position 1 (First ■)", value: 0 },
+        { label: "Position 2 (Second ■)", value: 1 },
+        { label: "Position 3 (Third ■)", value: 2 },
+        { label: "Position 4 (Fourth ■)", value: 3 }
+      ];
+      
+      const selectedPosition = positions.find(p => p.value === selectedIndex);
 
       return (
         <div className="mt-6 space-y-6">
-            <div className="p-6 bg-slate-50 border border-slate-200 rounded-lg text-center">
-                <p className="font-bold text-slate-800 mb-2">Sentence to Insert:</p>
-                <p className="text-lg font-serif italic text-blue-900 bg-white p-4 rounded shadow-sm border border-slate-200">
-                    "{question.options[0]?.text}"
+            {/* Sentence to Insert */}
+            <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl shadow-md">
+                <p className="font-bold text-slate-800 mb-3 flex items-center gap-2">
+                  <i className="fas fa-quote-left text-blue-600"></i>
+                  Sentence to Insert:
                 </p>
-                <p className="mt-4 text-sm text-slate-500">
-                    Click on <span className="font-bold">[ ■ Sentence to Insert ]</span> in the passage.
+                <p className="text-lg font-serif text-slate-900 bg-white p-4 rounded-lg shadow-sm border border-slate-200 leading-relaxed">
+                    {question.options[0]?.text}
                 </p>
+                <div className="mt-4 p-3 bg-blue-100 border-l-4 border-blue-600 rounded">
+                  <p className="text-sm text-blue-900 flex items-center gap-2">
+                    <i className="fas fa-info-circle"></i>
+                    <span>Click on the <strong>[■]</strong> buttons in the passage to select where this sentence should be inserted.</span>
+                  </p>
+                </div>
             </div>
 
-            <div className="p-4 border-2 border-slate-300 rounded-lg bg-white flex justify-between items-center">
-                <span className="text-slate-500 font-bold">Selected Answer:</span>
-                <span className={`text-lg font-bold ${selectedIndex >= 0 ? 'text-blue-600' : 'text-slate-400'}`}>
-                    {selectedLabel}
-                </span>
+            {/* Visual Selection Status */}
+            <div className={`p-5 border-3 rounded-xl shadow-lg transition-all ${
+              selectedIndex >= 0 
+                ? 'bg-green-50 border-green-500' 
+                : 'bg-slate-50 border-slate-300'
+            }`}>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm text-slate-600 font-medium mb-1">Your Selection:</p>
+                    <p className={`text-2xl font-bold flex items-center gap-2 ${
+                      selectedIndex >= 0 ? 'text-green-700' : 'text-slate-400'
+                    }`}>
+                      {selectedIndex >= 0 ? (
+                        <>
+                          <i className="fas fa-check-circle text-green-600"></i>
+                          {selectedPosition?.label}
+                        </>
+                      ) : (
+                        <>
+                          <i className="fas fa-square text-slate-300"></i>
+                          No position selected yet
+                        </>
+                      )}
+                    </p>
+                  </div>
+                  {selectedIndex >= 0 && (
+                    <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+                      {selectedIndex + 1}
+                    </div>
+                  )}
+                </div>
+            </div>
+
+            {/* Position Guide */}
+            <div className="p-4 bg-slate-100 rounded-lg border border-slate-300">
+              <p className="text-sm font-bold text-slate-700 mb-3">Available Positions:</p>
+              <div className="grid grid-cols-2 gap-2">
+                {positions.map((pos) => (
+                  <div 
+                    key={pos.value}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      selectedIndex === pos.value
+                        ? 'bg-blue-600 border-blue-700 text-white shadow-md'
+                        : 'bg-white border-slate-300 text-slate-700'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-lg">■</span>
+                      <span className="text-sm">{pos.label}</span>
+                      {selectedIndex === pos.value && (
+                        <i className="fas fa-check ml-auto"></i>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
         </div>
       );

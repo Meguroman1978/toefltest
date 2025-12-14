@@ -55,34 +55,46 @@ const ReadingPassage: React.FC<ReadingPassageProps> = ({
               const currentIndex = squareIndex++; // Capture current index value
               const isSelected = selectedInsertLocation === currentIndex;
 
-              // RENDER AS A ROBUST BUTTON
+              // RENDER AS A ROBUST BUTTON with unique styling
               return (
                 <button
-                  key={`marker-${i}`}
-                  type="button" // Explicitly set type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation(); // CRITICAL: Stop event from bubbling
-                    console.log(`Insert Marker Clicked: ${currentIndex}`);
+                  key={`marker-${i}-${currentIndex}`}
+                  type="button"
+                  onClick={() => {
+                    console.log(`[■] Marker ${currentIndex} clicked`);
                     if (onInsertText) {
-                        onInsertText(currentIndex);
+                      onInsertText(currentIndex);
+                      console.log(`onInsertText called with index: ${currentIndex}`);
+                    } else {
+                      console.warn('onInsertText handler not provided');
                     }
                   }}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onMouseUp={(e) => e.stopPropagation()}
                   className={`
-                    inline-flex items-center justify-center mx-2 align-middle transition-all duration-200 shadow-sm cursor-pointer select-none
+                    inline-flex items-center justify-center mx-2 align-middle transition-all duration-200 shadow-lg cursor-pointer select-none font-bold
                     ${isSelected 
-                      ? 'bg-blue-600 border-2 border-blue-800 text-white transform scale-125 px-3 py-1 rounded shadow-md z-50' 
-                      : 'bg-slate-800 border-2 border-slate-600 text-white hover:bg-slate-700 hover:scale-110 px-2 py-0.5 rounded opacity-90'
+                      ? 'bg-blue-600 border-2 border-blue-800 text-white px-4 py-2 rounded-lg shadow-xl scale-110' 
+                      : 'bg-slate-800 border-2 border-slate-600 text-white hover:bg-slate-700 hover:scale-105 px-3 py-1 rounded-md opacity-95 hover:opacity-100'
                     }
                   `}
+                  style={{ 
+                    zIndex: isSelected ? 100 : 50,
+                    position: 'relative'
+                  }}
                   aria-label={`Insert sentence at location ${currentIndex + 1}`}
+                  title={isSelected ? "Selected for insertion" : `Click to select position ${currentIndex + 1}`}
                 >
                     {isSelected ? (
-                        <span className="font-bold text-sm whitespace-nowrap flex items-center gap-1">
-                            <i className="fas fa-check text-[10px]"></i> Insert Here
+                        <span className="text-sm whitespace-nowrap flex items-center gap-2">
+                            <i className="fas fa-check-circle"></i>
+                            <span>Selected (Position {currentIndex + 1})</span>
                         </span>
                     ) : (
-                        <span className="font-bold text-lg leading-none">■</span>
+                        <span className="flex items-center gap-1">
+                            <span className="text-xl">■</span>
+                            <span className="text-xs opacity-75">{currentIndex + 1}</span>
+                        </span>
                     )}
                 </button>
               );
