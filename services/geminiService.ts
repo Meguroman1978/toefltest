@@ -1094,8 +1094,8 @@ export const generateGrammarQuestions = async (
   try {
     const response = await ai.models.generateContent({
       model: MODEL_NAME,
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: {
+      contents: prompt,
+      config: {
         responseMimeType: 'application/json',
         responseSchema: grammarQuestionSchema,
       }
