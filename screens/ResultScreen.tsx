@@ -52,19 +52,26 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ passage, answers, onHome })
         
         if (targetWord && correctOption) {
           // Check if this word is already in the book
-          const exists = vocabBook.some((item: any) => item.word === targetWord);
+          const existingIndex = vocabBook.findIndex((item: any) => item.word === targetWord);
           
-          if (!exists) {
+          if (existingIndex >= 0) {
+            // Update existing entry: increment mistakes count and update lastMistake
+            vocabBook[existingIndex].mistakes = (vocabBook[existingIndex].mistakes || 1) + 1;
+            vocabBook[existingIndex].lastMistake = new Date().toISOString();
+          } else {
+            // Add new entry
             vocabBook.push({
               word: targetWord,
               definition: correctOption.text,
               example: q.relevantContext || '',
               question: q.prompt,
-              date: new Date().toISOString()
+              date: new Date().toISOString(),
+              mistakes: 1,
+              lastMistake: new Date().toISOString()
             });
-            
-            localStorage.setItem('toefl_vocab_book', JSON.stringify(vocabBook));
           }
+          
+          localStorage.setItem('toefl_vocab_book', JSON.stringify(vocabBook));
         }
       }
     });

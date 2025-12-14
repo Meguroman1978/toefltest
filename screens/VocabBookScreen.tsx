@@ -6,6 +6,8 @@ interface VocabItem {
   example: string;
   date: string;
   question: string;
+  mistakes: number; // 間違えた回数
+  lastMistake: string; // 最後に間違えた日時
 }
 
 interface VocabBookScreenProps {
@@ -40,9 +42,26 @@ const VocabBookScreen: React.FC<VocabBookScreenProps> = ({ onClose }) => {
     }
   };
 
+  // スコア計算: 間違えた回数 × 最近度（日数の逆数）
+  const calculateScore = (item: VocabItem): number => {
+    const daysSinceLastMistake = Math.max(
+      1,
+      Math.floor((Date.now() - new Date(item.lastMistake).getTime()) / (1000 * 60 * 60 * 24))
+    );
+    // 間違えた回数が多く、最近間違えたものほどスコアが高い
+    const recencyFactor = Math.max(1, 30 - daysSinceLastMistake) / 30;
+    return item.mistakes * (1 + recencyFactor * 2);
+  };
+
+  // ランキング順にソート（スコアの高い順）
+  const sortedList = [...vocabList].sort((a, b) => calculateScore(b) - calculateScore(a));
+
   const filteredList = filter === 'recent' 
-    ? vocabList.slice(0, 20) 
-    : vocabList;
+    ? sortedList.slice(0, 20) 
+    : sortedList;
+
+  // 最大の間違い回数を取得（バー表示用）
+  const maxMistakes = Math.max(...vocabList.map(item => item.mistakes), 1);
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -115,28 +134,56 @@ const VocabBookScreen: React.FC<VocabBookScreenProps> = ({ onClose }) => {
             </div>
           ) : (
             <div className="space-y-4">
-              {filteredList.map((item, index) => (
-                <div 
-                  key={index}
-                  className="bg-white border border-slate-200 rounded-xl p-5 hover:shadow-md transition-shadow"
-                >
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold text-slate-800 mb-1">
-                        {item.word}
-                      </h3>
-                      <p className="text-sm text-slate-600 mb-3">
-                        {item.definition}
-                      </p>
+              {filteredList.map((item, index) => {
+                const score = calculateScore(item);
+                const barWidth = (item.mistakes / maxMistakes) * 100;
+                const originalIndex = vocabList.findIndex(v => v.word === item.word && v.date === item.date);
+                
+                return (
+                  <div 
+                    key={index}
+                    className="bg-white border border-slate-200 rounded-xl p-5 hover:shadow-md transition-shadow relative overflow-hidden"
+                  >
+                    {/* ランキングバッジ */}
+                    <div className="absolute top-0 right-0 bg-gradient-to-br from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-bl-lg font-bold text-sm shadow-md">
+                      #{index + 1}
                     </div>
-                    <button
-                      onClick={() => handleRemove(index)}
-                      className="ml-4 w-8 h-8 rounded-full bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center transition-colors flex-shrink-0"
-                      title="削除"
-                    >
-                      <i className="fas fa-times text-sm"></i>
-                    </button>
-                  </div>
+
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex-1 pr-12">
+                        <h3 className="text-xl font-bold text-slate-800 mb-1">
+                          {item.word}
+                        </h3>
+                        <p className="text-sm text-slate-600 mb-3">
+                          {item.definition}
+                        </p>
+                        
+                        {/* 間違い回数バー */}
+                        <div className="mb-2">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-xs font-semibold text-slate-500">
+                              間違い回数: {item.mistakes}回
+                            </span>
+                            <span className="text-xs font-bold text-purple-600">
+                              重要度スコア: {score.toFixed(1)}
+                            </span>
+                          </div>
+                          <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden shadow-inner">
+                            <div 
+                              className="h-full bg-gradient-to-r from-red-400 via-orange-400 to-yellow-400 rounded-full transition-all duration-500"
+                              style={{ width: `${barWidth}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleRemove(originalIndex)}
+                        className="ml-4 w-8 h-8 rounded-full bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center transition-colors flex-shrink-0"
+                        title="削除"
+                      >
+                        <i className="fas fa-times text-sm"></i>
+                      </button>
+                    </div>
 
                   {item.example && (
                     <div className="bg-slate-50 rounded-lg p-3 mb-3 border-l-4 border-purple-400">
@@ -163,7 +210,8 @@ const VocabBookScreen: React.FC<VocabBookScreenProps> = ({ onClose }) => {
                     </span>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
