@@ -197,131 +197,109 @@ const PastScoreReportsScreen: React.FC<PastScoreReportsScreenProps> = ({ onHome,
   const trends = calculateTrends();
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-slate-100 overflow-y-auto p-8">
+    <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-slate-100 overflow-y-auto p-3">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
-          <div className="flex justify-between items-center mb-6">
+        <div className="bg-white rounded-lg shadow p-3 mb-3">
+          <div className="flex justify-between items-center mb-2">
             <div>
-              <h1 className="text-4xl font-extrabold text-slate-800 mb-2">📊 過去のスコアレポート</h1>
-              <p className="text-slate-600">全{reports.length}回のFull Test受講履歴</p>
+              <h1 className="text-xl font-bold text-slate-800">📊 過去のスコアレポート</h1>
+              <p className="text-xs text-slate-600">全{reports.length}回</p>
             </div>
             <div className="flex gap-3">
               <button
                 onClick={handleClearAll}
-                className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-bold shadow-lg"
+                className="bg-red-600 text-white px-3 py-1.5 text-xs rounded hover:bg-red-700 transition-colors font-bold"
               >
-                <i className="fas fa-trash mr-2"></i>すべて削除
+                <i className="fas fa-trash mr-1"></i>全削除
               </button>
               <button
                 onClick={onHome}
-                className="bg-slate-800 text-white px-6 py-3 rounded-lg hover:bg-slate-900 transition-colors font-bold shadow-lg"
+                className="bg-slate-800 text-white px-3 py-1.5 text-xs rounded hover:bg-slate-900 transition-colors font-bold"
               >
-                <i className="fas fa-home mr-2"></i>ホームに戻る
+                <i className="fas fa-home mr-1"></i>ホーム
               </button>
             </div>
           </div>
 
           {/* Average Scores Summary */}
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-6 text-white mb-6">
-            <h2 className="text-xl font-bold mb-4">📈 平均スコア</h2>
-            <div className="grid grid-cols-5 gap-4">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded p-3 text-white mb-2">
+            <h2 className="text-sm font-bold mb-2">📈 平均スコア</h2>
+            <div className="grid grid-cols-5 gap-2">
               <div className="text-center">
-                <div className="text-3xl font-extrabold">{averages.total}</div>
-                <div className="text-sm text-blue-100 mt-1">総合</div>
+                <div className="text-xl font-extrabold">{averages.total}</div>
+                <div className="text-[9px] text-blue-100">総合</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">{averages.reading}</div>
-                <div className="text-xs text-blue-100 mt-1">Reading</div>
+                <div className="text-base font-bold">{averages.reading}</div>
+                <div className="text-[9px] text-blue-100">R</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">{averages.listening}</div>
-                <div className="text-xs text-blue-100 mt-1">Listening</div>
+                <div className="text-base font-bold">{averages.listening}</div>
+                <div className="text-[9px] text-blue-100">L</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">{averages.speaking}</div>
-                <div className="text-xs text-blue-100 mt-1">Speaking</div>
+                <div className="text-base font-bold">{averages.speaking}</div>
+                <div className="text-[9px] text-blue-100">S</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">{averages.writing}</div>
-                <div className="text-xs text-blue-100 mt-1">Writing</div>
+                <div className="text-base font-bold">{averages.writing}</div>
+                <div className="text-[9px] text-blue-100">W</div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Past Reports List */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
+        {/* Past Reports List - Compact */}
+        <div className="grid md:grid-cols-3 gap-3 mb-3">
           {reports.map((report, index) => {
             const previousReport = reports[index + 1];
             return (
-              <div key={report.id} className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500 hover:shadow-2xl transition-shadow">
-                <div className="flex justify-between items-start mb-4">
+              <div key={report.id} className="bg-white rounded-lg shadow p-3 border-l-2 border-blue-500">
+                <div className="flex justify-between items-start mb-2">
                   <div>
-                    <div className="text-sm text-slate-500 mb-1">
+                    <div className="text-[10px] text-slate-500">
                       {new Date(report.date).toLocaleDateString('ja-JP', { 
-                        year: 'numeric', 
-                        month: 'long', 
+                        month: 'short', 
                         day: 'numeric' 
                       })}
                     </div>
-                    <div className="text-xs text-slate-400">ID: {report.id.substring(0, 8)}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-4xl font-extrabold text-blue-900">{report.totalScore}</div>
-                    <div className="text-xs text-slate-500">/ 120</div>
+                    <div className="text-2xl font-extrabold text-blue-900">{report.totalScore}</div>
+                    <div className="text-[9px] text-slate-500">/120</div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-4 gap-2 mb-4">
-                  <div className="text-center p-2 bg-blue-50 rounded">
-                    <div className="text-lg font-bold text-blue-900">{report.readingScore}</div>
-                    <div className="text-xs text-slate-600">R</div>
-                    {previousReport && (
-                      <div className="text-xs mt-1">
-                        {getTrendIcon(report.readingScore, previousReport.readingScore)}
-                      </div>
-                    )}
+                <div className="grid grid-cols-4 gap-1 mb-2">
+                  <div className="text-center p-1 bg-blue-50 rounded">
+                    <div className="text-sm font-bold text-blue-900">{report.readingScore}</div>
+                    <div className="text-[9px] text-slate-600">R</div>
                   </div>
-                  <div className="text-center p-2 bg-green-50 rounded">
-                    <div className="text-lg font-bold text-green-900">{report.listeningScore}</div>
-                    <div className="text-xs text-slate-600">L</div>
-                    {previousReport && (
-                      <div className="text-xs mt-1">
-                        {getTrendIcon(report.listeningScore, previousReport.listeningScore)}
-                      </div>
-                    )}
+                  <div className="text-center p-1 bg-green-50 rounded">
+                    <div className="text-sm font-bold text-green-900">{report.listeningScore}</div>
+                    <div className="text-[9px] text-slate-600">L</div>
                   </div>
-                  <div className="text-center p-2 bg-orange-50 rounded">
-                    <div className="text-lg font-bold text-orange-900">{report.speakingScore}</div>
-                    <div className="text-xs text-slate-600">S</div>
-                    {previousReport && (
-                      <div className="text-xs mt-1">
-                        {getTrendIcon(report.speakingScore, previousReport.speakingScore)}
-                      </div>
-                    )}
+                  <div className="text-center p-1 bg-orange-50 rounded">
+                    <div className="text-sm font-bold text-orange-900">{report.speakingScore}</div>
+                    <div className="text-[9px] text-slate-600">S</div>
                   </div>
-                  <div className="text-center p-2 bg-purple-50 rounded">
-                    <div className="text-lg font-bold text-purple-900">{report.writingScore}</div>
-                    <div className="text-xs text-slate-600">W</div>
-                    {previousReport && (
-                      <div className="text-xs mt-1">
-                        {getTrendIcon(report.writingScore, previousReport.writingScore)}
-                      </div>
-                    )}
+                  <div className="text-center p-1 bg-purple-50 rounded">
+                    <div className="text-sm font-bold text-purple-900">{report.writingScore}</div>
+                    <div className="text-[9px] text-slate-600">W</div>
                   </div>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-1">
                   <button
                     onClick={() => onViewReport(report)}
-                    className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-sm"
+                    className="flex-1 bg-blue-600 text-white py-1 text-[10px] rounded hover:bg-blue-700 transition-colors font-semibold"
                   >
-                    <i className="fas fa-eye mr-2"></i>詳細レポートを見る
+                    <i className="fas fa-eye mr-1"></i>詳細
                   </button>
                   <button
                     onClick={() => handleDelete(index)}
-                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors font-semibold text-sm"
+                    className="bg-red-500 text-white px-2 py-1 text-[10px] rounded hover:bg-red-600 transition-colors"
                     title="削除"
                   >
                     <i className="fas fa-trash"></i>
@@ -332,34 +310,34 @@ const PastScoreReportsScreen: React.FC<PastScoreReportsScreenProps> = ({ onHome,
           })}
         </div>
 
-        {/* Comprehensive Analysis */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h2 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center">
-              <i className="fas fa-chart-line"></i>
+        {/* Comprehensive Analysis - Compact */}
+        <div className="bg-white rounded-lg shadow p-3">
+          <h2 className="text-sm font-bold text-slate-800 mb-2 flex items-center gap-2">
+            <div className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center">
+              <i className="fas fa-chart-line text-[10px]"></i>
             </div>
-            総合的な分析と学習アドバイス
+            AI分析
           </h2>
 
           {isAnalyzing ? (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
-              <p className="text-slate-600 mt-4">データを分析中...</p>
+            <div className="text-center py-4">
+              <div className="inline-block animate-spin rounded-full h-6 w-6 border-2 border-blue-500 border-t-transparent"></div>
+              <p className="text-xs text-slate-600 mt-2">分析中...</p>
             </div>
           ) : (
-            <div className="prose prose-slate max-w-none max-h-[600px] overflow-y-auto pr-4 custom-scroll">
-              <div className="whitespace-pre-wrap text-slate-700 leading-relaxed">
+            <div className="prose prose-slate max-w-none max-h-[400px] overflow-y-auto pr-2 custom-scroll">
+              <div className="whitespace-pre-wrap text-slate-700 text-[10px] leading-relaxed">
                 {analysis.split('\n').map((line, index) => {
                   if (line.startsWith('## ')) {
-                    return <h2 key={index} className="text-2xl font-bold text-slate-800 mt-6 mb-4">{line.substring(3)}</h2>;
+                    return <h2 key={index} className="text-xs font-bold text-slate-800 mt-2 mb-1">{line.substring(3)}</h2>;
                   } else if (line.startsWith('### ')) {
-                    return <h3 key={index} className="text-xl font-bold text-slate-700 mt-5 mb-3">{line.substring(4)}</h3>;
+                    return <h3 key={index} className="text-[11px] font-bold text-slate-700 mt-2 mb-1">{line.substring(4)}</h3>;
                   } else if (line.startsWith('- ')) {
-                    return <li key={index} className="ml-6 mb-2">{line.substring(2)}</li>;
+                    return <li key={index} className="ml-4 mb-1 text-[10px]">{line.substring(2)}</li>;
                   } else if (line.trim() === '') {
                     return <br key={index} />;
                   } else {
-                    return <p key={index} className="mb-3">{line}</p>;
+                    return <p key={index} className="mb-1">{line}</p>;
                   }
                 })}
               </div>
@@ -367,13 +345,13 @@ const PastScoreReportsScreen: React.FC<PastScoreReportsScreenProps> = ({ onHome,
           )}
         </div>
 
-        {/* Action Buttons */}
-        <div className="mt-8 text-center space-x-4">
+        {/* Action Buttons - Compact */}
+        <div className="mt-3 text-center">
           <button
             onClick={() => window.print()}
-            className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-bold shadow-lg"
+            className="bg-blue-600 text-white px-4 py-1.5 text-xs rounded hover:bg-blue-700 transition-colors font-bold"
           >
-            <i className="fas fa-print mr-2"></i>印刷 / PDF保存
+            <i className="fas fa-print mr-1"></i>印刷/PDF
           </button>
         </div>
       </div>
