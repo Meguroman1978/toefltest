@@ -56,7 +56,7 @@ const App: React.FC = () => {
   const [userAnswers, setUserAnswers] = useState<Record<string, string[]>>({});
   
   // State for Feedback Result (Speaking/Writing)
-  const [feedbackData, setFeedbackData] = useState<{score: number, maxScore: number, feedback: string, type: 'SPEAKING' | 'WRITING'} | null>(null);
+  const [feedbackData, setFeedbackData] = useState<{score: number, maxScore: number, feedback: string, type: 'SPEAKING' | 'WRITING', task?: WritingTask | SpeakingTask} | null>(null);
   
   // State for Full Test Mode
   const [fullTestMode, setFullTestMode] = useState(false);
@@ -314,7 +314,7 @@ const App: React.FC = () => {
       }
 
       // Show Result Screen
-      setFeedbackData({ score, maxScore: 4, feedback, type: 'SPEAKING' });
+      setFeedbackData({ score, maxScore: 4, feedback, type: 'SPEAKING', task: speakingTask || undefined });
       setScreen('FEEDBACK_RESULT');
   }
 
@@ -382,7 +382,7 @@ const App: React.FC = () => {
      }
      
      // Show Result Screen
-     setFeedbackData({ score, maxScore: 5, feedback, type: 'WRITING' });
+     setFeedbackData({ score, maxScore: 5, feedback, type: 'WRITING', task: writingTask || undefined });
      setScreen('FEEDBACK_RESULT');
   }
   
@@ -473,6 +473,7 @@ const App: React.FC = () => {
           maxScore={feedbackData.maxScore}
           feedback={feedbackData.feedback}
           type={feedbackData.type}
+          task={feedbackData.task}
           onHome={goHomeForce}
         />
       )}

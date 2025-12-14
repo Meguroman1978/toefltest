@@ -429,6 +429,56 @@ export const generateVocabLesson = async (): Promise<GeneratedContent> => {
     return JSON.parse(response.text!) as GeneratedContent;
 };
 
+// --- VOCABULARY ENHANCEMENT ---
+
+export const generateContextExamples = async (word: string, definition: string): Promise<{
+    academic: string;
+    daily: string;
+    business: string;
+    political: string;
+}> => {
+    const exampleSchema: Schema = {
+        type: Type.OBJECT,
+        properties: {
+            academic: { type: Type.STRING },
+            daily: { type: Type.STRING },
+            business: { type: Type.STRING },
+            political: { type: Type.STRING }
+        },
+        required: ["academic", "daily", "business", "political"]
+    };
+
+    const prompt = `
+Generate 4 example sentences for the word/phrase "${word}" (meaning: ${definition}) in different contexts:
+
+1. **Academic Context**: A sentence that would appear in academic writing, research papers, or university lectures.
+2. **Daily Conversation Context**: A casual, everyday sentence that native speakers would use in informal settings.
+3. **Business Context**: A professional sentence suitable for business meetings, emails, or corporate communications.
+4. **Political Context**: A sentence related to politics, government, or international relations.
+
+**Requirements**:
+- Each sentence must naturally use the word "${word}"
+- Sentences should be 10-20 words long
+- Use varied vocabulary and sentence structures
+- Make sentences realistic and contextually appropriate
+- Ensure the word is used correctly according to its definition
+
+Respond in JSON format with keys: academic, daily, business, political
+`;
+
+    const response = await ai.models.generateContent({
+        model: MODEL_NAME,
+        contents: prompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: exampleSchema,
+            temperature: 0.8,
+        },
+    });
+
+    return JSON.parse(response.text || '{"academic":"","daily":"","business":"","political":""}');
+};
+
 // --- GRADING & ANALYSIS ---
 
 export const gradeWritingResponse = async (task: WritingTask, userResponse: string): Promise<{ score: number, feedback: string }> => {

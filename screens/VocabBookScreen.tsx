@@ -3,9 +3,15 @@ import React, { useState, useEffect } from 'react';
 interface VocabItem {
   word: string;
   definition: string;
-  example: string;
+  example: string; // Legacy field for backward compatibility
+  examples?: {
+    academic?: string;
+    daily?: string;
+    business?: string;
+    political?: string;
+  };
   date: string;
-  question: string;
+  question: string; // Will be removed from display
   mistakes: number; // 間違えた回数
   lastMistake: string; // 最後に間違えた日時
 }
@@ -17,6 +23,7 @@ interface VocabBookScreenProps {
 const VocabBookScreen: React.FC<VocabBookScreenProps> = ({ onClose }) => {
   const [vocabList, setVocabList] = useState<VocabItem[]>([]);
   const [filter, setFilter] = useState<'all' | 'recent'>('all');
+  const [generatingFor, setGeneratingFor] = useState<string | null>(null);
 
   useEffect(() => {
     // Load vocab from localStorage
@@ -39,6 +46,28 @@ const VocabBookScreen: React.FC<VocabBookScreenProps> = ({ onClose }) => {
     if (window.confirm('すべての単語を削除しますか？この操作は取り消せません。')) {
       setVocabList([]);
       localStorage.removeItem('toefl_vocab_book');
+    }
+  };
+
+  const handleGenerateExamples = async (index: number) => {
+    const item = vocabList[index];
+    if (item.examples) {
+      alert('この単語にはすでに例文が生成されています。');
+      return;
+    }
+
+    setGeneratingFor(item.word);
+    try {
+      const examples = await generateContextExamples(item.word, item.definition);
+      const updated = [...vocabList];
+      updated[index] = { ...item, examples };
+      setVocabList(updated);
+      localStorage.setItem('toefl_vocab_book', JSON.stringify(updated));
+    } catch (error) {
+      console.error('Failed to generate examples:', error);
+      alert('例文の生成に失敗しました。もう一度お試しください。');
+    } finally {
+      setGeneratingFor(null);
     }
   };
 
@@ -185,23 +214,87 @@ const VocabBookScreen: React.FC<VocabBookScreenProps> = ({ onClose }) => {
                       </button>
                     </div>
 
-                  {item.example && (
-                    <div className="bg-slate-50 rounded-lg p-3 mb-3 border-l-4 border-purple-400">
-                      <span className="text-xs font-bold text-slate-400 uppercase block mb-1">例文</span>
-                      <p className="text-sm text-slate-700 italic">
-                        {item.example}
-                      </p>
+                  {/* Generate Examples Button */}
+                  {!item.examples && (
+                    <div className="mb-3">
+                      <button
+                        onClick={() => handleGenerateExamples(originalIndex)}
+                        disabled={generatingFor === item.word}
+                        className="w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-lg font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        {generatingFor === item.word ? (
+                          <>
+                            <i className="fas fa-spinner fa-spin"></i>
+                            例文を生成中...
+                          </>
+                        ) : (
+                          <>
+                            <i className="fas fa-magic"></i>
+                            4パターンの例文を生成
+                          </>
+                        )}
+                      </button>
                     </div>
                   )}
 
-                  {item.question && (
-                    <div className="bg-blue-50 rounded-lg p-3 mb-3 border-l-4 border-blue-400">
-                      <span className="text-xs font-bold text-slate-400 uppercase block mb-1">出題された問題</span>
-                      <p className="text-sm text-slate-700">
-                        {item.question}
-                      </p>
-                    </div>
-                  )}
+                  {/* Context-Specific Examples */}
+                  <div className="space-y-2 mb-3">
+                    {item.examples?.academic && (
+                      <div className="bg-blue-50 rounded-lg p-3 border-l-4 border-blue-400">
+                        <span className="text-xs font-bold text-blue-700 uppercase block mb-1">
+                          <i className="fas fa-graduation-cap mr-1"></i>Academic Context
+                        </span>
+                        <p className="text-sm text-slate-700 italic">
+                          {item.examples.academic}
+                        </p>
+                      </div>
+                    )}
+                    
+                    {item.examples?.daily && (
+                      <div className="bg-green-50 rounded-lg p-3 border-l-4 border-green-400">
+                        <span className="text-xs font-bold text-green-700 uppercase block mb-1">
+                          <i className="fas fa-comments mr-1"></i>Daily Conversation
+                        </span>
+                        <p className="text-sm text-slate-700 italic">
+                          {item.examples.daily}
+                        </p>
+                      </div>
+                    )}
+                    
+                    {item.examples?.business && (
+                      <div className="bg-orange-50 rounded-lg p-3 border-l-4 border-orange-400">
+                        <span className="text-xs font-bold text-orange-700 uppercase block mb-1">
+                          <i className="fas fa-briefcase mr-1"></i>Business Context
+                        </span>
+                        <p className="text-sm text-slate-700 italic">
+                          {item.examples.business}
+                        </p>
+                      </div>
+                    )}
+                    
+                    {item.examples?.political && (
+                      <div className="bg-purple-50 rounded-lg p-3 border-l-4 border-purple-400">
+                        <span className="text-xs font-bold text-purple-700 uppercase block mb-1">
+                          <i className="fas fa-landmark mr-1"></i>Political Context
+                        </span>
+                        <p className="text-sm text-slate-700 italic">
+                          {item.examples.political}
+                        </p>
+                      </div>
+                    )}
+                    
+                    {/* Fallback to legacy example if no context-specific examples */}
+                    {!item.examples && item.example && (
+                      <div className="bg-slate-50 rounded-lg p-3 border-l-4 border-slate-400">
+                        <span className="text-xs font-bold text-slate-500 uppercase block mb-1">
+                          <i className="fas fa-quote-left mr-1"></i>Example
+                        </span>
+                        <p className="text-sm text-slate-700 italic">
+                          {item.example}
+                        </p>
+                      </div>
+                    )}
+                  </div>
 
                   <div className="flex justify-between items-center text-xs text-slate-400 mt-3 pt-3 border-t">
                     <span>

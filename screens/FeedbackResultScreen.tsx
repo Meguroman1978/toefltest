@@ -1,15 +1,18 @@
 import React from 'react';
+import { WritingTask, SpeakingTask } from '../types';
 
 interface FeedbackResultScreenProps {
   score: number;
   maxScore: number;
   feedback: string;
   type: 'SPEAKING' | 'WRITING';
+  task?: WritingTask | SpeakingTask;
   onHome: () => void;
 }
 
-const FeedbackResultScreen: React.FC<FeedbackResultScreenProps> = ({ score, maxScore, feedback, type, onHome }) => {
+const FeedbackResultScreen: React.FC<FeedbackResultScreenProps> = ({ score, maxScore, feedback, type, task, onHome }) => {
   const isSpeaking = type === 'SPEAKING';
+  const writingTask = !isSpeaking && task ? task as WritingTask : null;
   
   // Theme configuration based on test type
   const theme = isSpeaking ? {
@@ -59,6 +62,34 @@ const FeedbackResultScreen: React.FC<FeedbackResultScreenProps> = ({ score, maxS
             </button>
           </div>
         </div>
+
+        {/* Reference Text Section (Writing Only) */}
+        {writingTask && writingTask.type === 'INTEGRATED' && writingTask.reading && (
+          <div className="bg-white rounded-xl shadow-md border border-slate-200 p-8 mb-6">
+            <div className="flex items-center gap-3 mb-6 border-b border-black/5 pb-4">
+              <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-md">
+                <i className="fas fa-book-open"></i>
+              </div>
+              <h2 className="text-2xl font-bold text-slate-800">Reference Text</h2>
+            </div>
+            <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 max-h-64 overflow-y-auto">
+              <div className="text-slate-700 whitespace-pre-wrap leading-relaxed text-sm">
+                {writingTask.reading}
+              </div>
+            </div>
+            {writingTask.listeningTranscript && (
+              <div className="mt-4 bg-blue-50 p-6 rounded-lg border border-blue-200 max-h-64 overflow-y-auto">
+                <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2">
+                  <i className="fas fa-headphones"></i>
+                  Lecture Transcript
+                </h3>
+                <div className="text-slate-700 whitespace-pre-wrap leading-relaxed text-sm">
+                  {writingTask.listeningTranscript}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* AI Feedback Section */}
         <div className={`bg-gradient-to-br ${theme.gradient} rounded-xl shadow-md border ${theme.border} p-8 animate-fade-in`}>

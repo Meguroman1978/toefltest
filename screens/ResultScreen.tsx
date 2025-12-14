@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Passage, QuestionType, ListeningSet } from '../types';
-import { generatePerformanceAnalysis } from '../services/geminiService';
+import { generatePerformanceAnalysis, generateContextExamples } from '../services/geminiService';
 import { speakText, stopAudio } from '../utils/audio';
 
 interface ResultScreenProps {
@@ -64,20 +64,35 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ passage, answers, onHome, l
             // Update existing entry: increment mistakes count and update lastMistake
             vocabBook[existingIndex].mistakes = (vocabBook[existingIndex].mistakes || 1) + 1;
             vocabBook[existingIndex].lastMistake = new Date().toISOString();
+            localStorage.setItem('toefl_vocab_book', JSON.stringify(vocabBook));
           } else {
-            // Add new entry
-            vocabBook.push({
+            // Add new entry with AI-generated context examples
+            const newEntry = {
               word: targetWord,
               definition: correctOption.text,
-              example: q.relevantContext || '',
+              example: q.relevantContext || '', // Legacy field
               question: q.prompt,
               date: new Date().toISOString(),
               mistakes: 1,
-              lastMistake: new Date().toISOString()
+              lastMistake: new Date().toISOString(),
+              examples: null as any // Will be populated by AI
+            };
+            
+            vocabBook.push(newEntry);
+            localStorage.setItem('toefl_vocab_book', JSON.stringify(vocabBook));
+            
+            // Generate context-specific examples asynchronously (non-blocking)
+            generateContextExamples(targetWord, correctOption.text).then(examples => {
+              const updatedBook = JSON.parse(localStorage.getItem('toefl_vocab_book') || '[]');
+              const entryIndex = updatedBook.findIndex((item: any) => item.word === targetWord && item.date === newEntry.date);
+              if (entryIndex >= 0) {
+                updatedBook[entryIndex].examples = examples;
+                localStorage.setItem('toefl_vocab_book', JSON.stringify(updatedBook));
+              }
+            }).catch(err => {
+              console.error('Failed to generate context examples:', err);
             });
           }
-          
-          localStorage.setItem('toefl_vocab_book', JSON.stringify(vocabBook));
         }
       }
     });
