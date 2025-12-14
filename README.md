@@ -14,24 +14,29 @@ An AI-powered TOEFL practice application that generates unlimited TPO-style pass
 
 ## 🚀 Quick Deploy to Fly.io
 
-**⚠️ If you see a white screen at https://toefltest.fly.dev/, follow these steps:**
+**✅ Latest Fix (2025-12-14)**: API Key issue resolved! See [FINAL_DEPLOY.md](./FINAL_DEPLOY.md) for the complete solution.
 
-See [QUICKSTART.md](./QUICKSTART.md) for a 3-step deployment guide.
-
-Or use these commands:
+### Fast Deploy (3 commands):
 
 ```bash
-# 1. Login to Fly.io
-flyctl auth login
+# 1. Set API Key environment variable
+export GEMINI_API_KEY="your-api-key-here"
 
-# 2. Set your Gemini API Key
-flyctl secrets set GEMINI_API_KEY="your-api-key-here"
+# 2. Pull latest code
+git pull origin main
 
-# 3. Deploy
-flyctl deploy
+# 3. Deploy with build argument
+flyctl deploy --build-arg GEMINI_API_KEY=$GEMINI_API_KEY
 ```
 
-For detailed instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md).
+**⚠️ Important**: You must pass `--build-arg GEMINI_API_KEY=$GEMINI_API_KEY` during deployment for the API key to be embedded in the build.
+
+### Troubleshooting Guides:
+
+- **[FINAL_DEPLOY.md](./FINAL_DEPLOY.md)** - Complete deployment guide with API key fix ⭐
+- **[FIX_API_KEY.md](./FIX_API_KEY.md)** - API Key error solutions
+- **[FIX_BLANK_PAGE.md](./FIX_BLANK_PAGE.md)** - White screen fix
+- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Detailed deployment documentation
 
 ---
 
@@ -93,8 +98,14 @@ For detailed instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md).
 
 ## 📖 Documentation
 
-- [QUICKSTART.md](./QUICKSTART.md) - 3-step deployment guide
-- [DEPLOYMENT.md](./DEPLOYMENT.md) - Detailed deployment documentation
+### Deployment Guides
+- **[FINAL_DEPLOY.md](./FINAL_DEPLOY.md)** - ⭐ Latest complete deployment guide
+- [FIX_API_KEY.md](./FIX_API_KEY.md) - API Key troubleshooting
+- [FIX_BLANK_PAGE.md](./FIX_BLANK_PAGE.md) - White screen fix
+- [QUICKSTART.md](./QUICKSTART.md) - Quick 3-step guide
+- [DEPLOYMENT.md](./DEPLOYMENT.md) - Detailed documentation
+
+### Development
 - [CONTRIBUTING.md](./CONTRIBUTING.md) - Contribution guidelines (coming soon)
 
 ---
