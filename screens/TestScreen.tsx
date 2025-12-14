@@ -14,11 +14,12 @@ interface TestScreenProps {
 const TestScreen: React.FC<TestScreenProps> = ({ passage, onComplete, onExit, totalTimeLimit = 1080 }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
+  const [questionStartTime, setQuestionStartTime] = useState<number>(Date.now());
   
   const currentQuestion = passage.questions[currentQuestionIndex];
   
-  // Suggested time per question: ~1.8 mins (108s)
-  const questionTimeLimit = 108;
+  // Calculate time per question dynamically
+  const questionTimeLimit = Math.floor(totalTimeLimit / passage.questions.length);
 
   const handleAnswerChange = (selected: string[]) => {
     setAnswers(prev => ({
@@ -30,6 +31,7 @@ const TestScreen: React.FC<TestScreenProps> = ({ passage, onComplete, onExit, to
   const handleNext = () => {
     if (currentQuestionIndex < passage.questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
+      setQuestionStartTime(Date.now()); // Reset timer for new question
     } else {
       onComplete(answers);
     }
@@ -38,6 +40,7 @@ const TestScreen: React.FC<TestScreenProps> = ({ passage, onComplete, onExit, to
   const handlePrev = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(prev => prev - 1);
+      setQuestionStartTime(Date.now()); // Reset timer for new question
     }
   };
 
@@ -118,6 +121,7 @@ const TestScreen: React.FC<TestScreenProps> = ({ passage, onComplete, onExit, to
             currentIndex={currentQuestionIndex}
             onNext={handleNext}
             onPrev={handlePrev}
+            timePerQuestion={questionTimeLimit}
           />
         </div>
       </div>

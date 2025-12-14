@@ -9,6 +9,7 @@ interface QuestionPanelProps {
   currentIndex: number;
   onNext: () => void;
   onPrev: () => void;
+  timePerQuestion?: number; // Time limit per question in seconds
 }
 
 const QuestionPanel: React.FC<QuestionPanelProps> = ({
@@ -18,8 +19,15 @@ const QuestionPanel: React.FC<QuestionPanelProps> = ({
   totalQuestions,
   currentIndex,
   onNext,
-  onPrev
+  onPrev,
+  timePerQuestion
 }) => {
+  
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const handleOptionClick = (optionId: string) => {
     if (question.type === QuestionType.SINGLE_CHOICE) {
@@ -195,7 +203,17 @@ const QuestionPanel: React.FC<QuestionPanelProps> = ({
     <div className="h-full flex flex-col bg-slate-50">
       {/* Header */}
       <div className="p-4 border-b border-slate-200 bg-white flex justify-between items-center shadow-sm z-10">
-        <h2 className="text-lg font-bold text-slate-800">Question {currentIndex + 1} of {totalQuestions}</h2>
+        <div className="flex items-center gap-4">
+          <h2 className="text-lg font-bold text-slate-800">Question {currentIndex + 1} of {totalQuestions}</h2>
+          {timePerQuestion && (
+            <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-full border border-blue-200">
+              <i className="fas fa-clock text-blue-600 text-sm"></i>
+              <span className="text-sm font-bold text-blue-700">
+                ~{formatTime(timePerQuestion)} per Q
+              </span>
+            </div>
+          )}
+        </div>
         <div className="flex gap-2">
             <button 
               onClick={onPrev}
