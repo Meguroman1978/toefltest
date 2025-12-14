@@ -176,18 +176,18 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, onShowPastReports, isL
       <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-slate-900 to-black flex items-center justify-center p-4 relative overflow-hidden font-sans">
         <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none"></div>
 
-      <div className="max-w-6xl w-full flex flex-col lg:flex-row bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden relative z-10 min-h-[700px]">
+      <div className="max-w-6xl w-full flex flex-col lg:flex-row bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden relative z-10 h-[85vh] max-h-[900px]">
         
         {/* Left Side: Dashboard */}
-        <div className="lg:w-4/12 bg-slate-100 p-8 flex flex-col border-r border-slate-200">
-          <div className="flex items-center gap-3 mb-8">
+        <div className="lg:w-4/12 bg-slate-100 p-8 flex flex-col border-r border-slate-200 overflow-hidden">
+          <div className="flex items-center gap-3 mb-8 flex-shrink-0">
              <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg text-white">
                <i className="fas fa-graduation-cap"></i>
              </div>
              <span className="font-extrabold text-xl tracking-wide text-slate-800">TOEFL<span className="text-indigo-600">AI</span></span>
           </div>
 
-          <div className="space-y-3 flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-400 scrollbar-track-slate-200">
+          <div className="space-y-3 flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-400 scrollbar-track-slate-200 min-h-0">
              <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Test Modes</div>
              
              <button onClick={() => { setMode('READING'); setShowHistory(false); }} className={`w-full p-4 rounded-xl text-left transition-all flex items-center gap-3 ${mode === 'READING' ? 'bg-white shadow-md border-l-4 border-indigo-600' : 'hover:bg-white/50'}`}>
