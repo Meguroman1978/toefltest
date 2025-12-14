@@ -133,7 +133,7 @@ const WritingTestScreen: React.FC<WritingTestScreenProps> = ({ task, onComplete,
                             </button>
                         </div>
                     )}
-                    {step === 'LISTENING' && (
+                    {step === 'LISTENING' && task.listeningTranscript && (
                         <div className="flex flex-col items-center justify-center h-full text-center">
                              <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-6 text-slate-400">
                                 <i className="fas fa-headphones text-4xl"></i>
@@ -153,6 +153,14 @@ const WritingTestScreen: React.FC<WritingTestScreenProps> = ({ task, onComplete,
                                 {task.listeningTranscript}
                              </div>
 
+                             <button onClick={handleListeningDone} className="px-8 py-3 bg-blue-600 text-white rounded-lg font-bold">
+                                Start Writing
+                             </button>
+                        </div>
+                    )}
+                    {step === 'LISTENING' && !task.listeningTranscript && (
+                        <div className="flex flex-col items-center justify-center h-full text-center">
+                             <p className="text-slate-500 mb-8">No listening component for this task.</p>
                              <button onClick={handleListeningDone} className="px-8 py-3 bg-blue-600 text-white rounded-lg font-bold">
                                 Start Writing
                              </button>

@@ -177,13 +177,40 @@ const App: React.FC = () => {
   };
 
   const finishListeningTest = (answers: Record<string, string[]>) => {
-      // Logic similar to reading, just alert score for now
-      let correct = 0;
-      listeningSet?.questions.forEach(q => {
-          if (answers[q.id]?.[0] === q.correctAnswers[0]) correct++;
-      });
-      alert(`Listening Score: ${correct}/${listeningSet?.questions.length}`);
-      goHomeForce();
+      setUserAnswers(answers);
+      
+      // Save performance history
+      if (listeningSet) {
+          const historyData: PerformanceRecord[] = [];
+          listeningSet.questions.forEach(q => {
+              const userAns = answers[q.id] || [];
+              const correctAns = q.correctAnswers || [];
+              const isCorrect = userAns.length > 0 && correctAns.includes(userAns[0]);
+              
+              historyData.push({
+                  date: new Date().toISOString(),
+                  category: q.categoryLabel || "Listening",
+                  correct: isCorrect ? 1 : 0,
+                  total: 1
+              });
+          });
+          
+          const existing = localStorage.getItem('toefl_history');
+          const parsedExisting = existing ? JSON.parse(existing) : [];
+          const updated = [...parsedExisting, ...historyData];
+          localStorage.setItem('toefl_history', JSON.stringify(updated));
+          
+          // Convert ListeningSet to Passage format for ResultScreen
+          const listeningAsPassage: Passage = {
+              id: listeningSet.id,
+              title: listeningSet.title,
+              paragraphs: [listeningSet.transcript],
+              questions: listeningSet.questions
+          };
+          setPassage(listeningAsPassage);
+      }
+      
+      setScreen('RESULT');
   }
 
   const finishSpeakingTest = (score: number, feedback: string) => {

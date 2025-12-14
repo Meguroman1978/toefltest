@@ -12,6 +12,9 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ passage, answers, onHome })
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [categoryStats, setCategoryStats] = useState<Record<string, { total: number, correct: number }>>({});
+  
+  // Check if this is Vocab Lesson mode
+  const isVocabLesson = passage.questions.some(q => q.categoryLabel === "語彙・熟語特訓");
 
   useEffect(() => {
     // Calculate Stats
@@ -35,6 +38,35 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ passage, answers, onHome })
       }
       
       if (isCorrect) stats[cat].correct++;
+      
+      // Save incorrect vocabulary questions to vocab book
+      if (!isCorrect && (q.category === 'Vocabulary' || q.categoryLabel === '語彙問題' || q.categoryLabel === '語彙・熟語特訓')) {
+        const vocabBook = JSON.parse(localStorage.getItem('toefl_vocab_book') || '[]');
+        
+        // Extract the target word from the question (usually in bold or quotes)
+        const wordMatch = q.prompt.match(/[""](.+?)[""]|\*\*(.+?)\*\*/);
+        const targetWord = wordMatch ? (wordMatch[1] || wordMatch[2]) : '';
+        
+        // Get the correct answer text
+        const correctOption = q.options.find(opt => correctAns.includes(opt.id));
+        
+        if (targetWord && correctOption) {
+          // Check if this word is already in the book
+          const exists = vocabBook.some((item: any) => item.word === targetWord);
+          
+          if (!exists) {
+            vocabBook.push({
+              word: targetWord,
+              definition: correctOption.text,
+              example: q.relevantContext || '',
+              question: q.prompt,
+              date: new Date().toISOString()
+            });
+            
+            localStorage.setItem('toefl_vocab_book', JSON.stringify(vocabBook));
+          }
+        }
+      }
     });
 
     setCategoryStats(stats);
@@ -225,14 +257,16 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ passage, answers, onHome })
                   </div>
 
                   <div className="bg-slate-50 rounded-lg p-6 border border-slate-200 space-y-6">
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2"><i className="fas fa-quote-right mr-2"></i>Reference Text</h4>
-                      <div className="bg-white p-4 rounded border-l-4 border-blue-400 text-slate-700 italic font-serif text-sm">
-                        "{q.relevantContext}"
+                    {!isVocabLesson && q.relevantContext && (
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2"><i className="fas fa-quote-right mr-2"></i>Reference Text</h4>
+                        <div className="bg-white p-4 rounded border-l-4 border-blue-400 text-slate-700 italic font-serif text-sm">
+                          "{q.relevantContext}"
+                        </div>
                       </div>
-                    </div>
+                    )}
 
-                    <div className="grid md:grid-cols-2 gap-6">
+                    <div className={`grid ${isVocabLesson ? 'md:grid-cols-1' : 'md:grid-cols-2'} gap-6`}>
                       <div>
                         <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2"><i className="fas fa-lightbulb mr-2"></i>Explanation</h4>
                         <p className="text-sm text-slate-800 leading-relaxed">

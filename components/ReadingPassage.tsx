@@ -96,7 +96,7 @@ const ReadingPassage: React.FC<ReadingPassageProps> = ({
 
     // Default rendering for non-insert questions OR non-target paragraphs
     // We replace the markers with static text to avoid confusion if they exist in the text
-    const cleanText = text.replace(/(\[\s*■\s*\]|\[\u25A0\]|■)/g, ' '); 
+    const cleanText = text.replace(/(\[\s*■\s*\]|\[\u25A0\]|■)/g, ''); 
     
     return (
       <div className="relative group">
@@ -106,7 +106,7 @@ const ReadingPassage: React.FC<ReadingPassageProps> = ({
            </div>
         )}
         <span className={`${isHighlighted ? "bg-blue-50/80 rounded px-1 box-decoration-clone border-l-4 border-blue-400 pl-2 block shadow-sm" : ""}`}>
-          {parseText(isInsertQuestion && !isTargetParagraph ? cleanText : text)}
+          {parseText(!isInsertQuestion ? cleanText : text)}
         </span>
       </div>
     );

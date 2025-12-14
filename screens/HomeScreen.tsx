@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { TestMode, PerformanceRecord } from '../types';
 import { speakText, stopAudio } from '../utils/audio';
 import { generateHistoryAnalysis } from '../services/geminiService';
+import VocabBookScreen from './VocabBookScreen';
 
 interface HomeScreenProps {
   onStart: (topic: string, mode: TestMode, isIntensive?: boolean, weakCat?: string) => void;
@@ -12,7 +13,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, isLoading }) => {
   const [topic, setTopic] = useState('');
   const [mode, setMode] = useState<TestMode>('READING');
   const [showHistory, setShowHistory] = useState(false);
-  const [showSettings, setShowSettings] = useState(false); 
+  const [showSettings, setShowSettings] = useState(false);
+  const [showVocabBook, setShowVocabBook] = useState(false); 
   const [history, setHistory] = useState<PerformanceRecord[]>([]);
   
   // History Analysis State
@@ -164,8 +166,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, isLoading }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-slate-900 to-black flex items-center justify-center p-4 relative overflow-hidden font-sans">
-      <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none"></div>
+    <>
+      {showVocabBook && <VocabBookScreen onClose={() => setShowVocabBook(false)} />}
+      
+      <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-slate-900 to-black flex items-center justify-center p-4 relative overflow-hidden font-sans">
+        <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none"></div>
 
       <div className="max-w-6xl w-full flex flex-col lg:flex-row bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden relative z-10 min-h-[700px]">
         
@@ -227,14 +232,21 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, isLoading }) => {
                 </div>
 
                 <button 
-                    onClick={() => { setShowSettings(true); setShowHistory(false); }}
+                    onClick={() => { setShowVocabBook(true); setShowHistory(false); setShowSettings(false); }}
+                    className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold transition-colors flex justify-center items-center gap-2"
+                >
+                    <i className="fas fa-book"></i> 単語・熟語帳
+                </button>
+
+                <button 
+                    onClick={() => { setShowSettings(true); setShowHistory(false); setShowVocabBook(false); }}
                     className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold transition-colors flex justify-center items-center gap-2"
                 >
                     <i className="fas fa-cog"></i> System Setup (Mic/Audio)
                 </button>
 
                 <button 
-                    onClick={() => { setShowHistory(!showHistory); setShowSettings(false); }}
+                    onClick={() => { setShowHistory(!showHistory); setShowSettings(false); setShowVocabBook(false); }}
                     className="w-full py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold transition-colors flex justify-center items-center gap-2"
                 >
                     <i className="fas fa-chart-bar"></i> 過去の分野別正解率
@@ -465,6 +477,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, isLoading }) => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
