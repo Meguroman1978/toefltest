@@ -187,7 +187,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, onShowPastReports, isL
              <span className="font-extrabold text-xl tracking-wide text-slate-800">TOEFL<span className="text-indigo-600">AI</span></span>
           </div>
 
-          <div className="space-y-3 flex-1 overflow-y-auto">
+          <div className="space-y-3 flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-400 scrollbar-track-slate-200">
              <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Test Modes</div>
              
              <button onClick={() => { setMode('READING'); setShowHistory(false); }} className={`w-full p-4 rounded-xl text-left transition-all flex items-center gap-3 ${mode === 'READING' ? 'bg-white shadow-md border-l-4 border-indigo-600' : 'hover:bg-white/50'}`}>
@@ -260,6 +260,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, onShowPastReports, isL
                     className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors flex justify-center items-center gap-2"
                 >
                     <i className="fas fa-spell-check"></i> 単語・熟語特訓
+                </button>
+
+                <button 
+                    onClick={() => { setMode('GRAMMAR' as TestMode); setShowHistory(false); }}
+                    className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-bold transition-colors flex justify-center items-center gap-2"
+                >
+                    <i className="fas fa-language"></i> 文法特訓
                 </button>
 
                 <button 
@@ -441,6 +448,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, onShowPastReports, isL
                   {mode === 'SPEAKING' && 'Speaking Practice'}
                   {mode === 'WRITING' && 'Writing Practice'}
                   {mode === 'VOCAB_LESSON' && 'Vocabulary Booster'}
+                  {mode === 'GRAMMAR' && '文法特訓'}
                 </h2>
                 <p className="text-slate-500 text-sm">
                     {mode === 'READING' && 'Select a topic to generate TPO-style passages.'}
@@ -448,6 +456,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, onShowPastReports, isL
                     {mode === 'SPEAKING' && 'Record responses and get AI feedback.'}
                     {mode === 'WRITING' && 'Practice Integrated or Academic Discussion tasks.'}
                     {mode === 'VOCAB_LESSON' && 'Focused practice on difficult words.'}
+                    {mode === 'GRAMMAR' && 'Cambridge Grammar教材に基づいた文法問題演習'}
                 </p>
               </div>
               
@@ -497,10 +506,86 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, onShowPastReports, isL
                   </div>
               )}
 
+              {mode === 'GRAMMAR' && (
+                  <div className="mb-6">
+                    <h3 className="text-lg font-bold text-slate-700 mb-4">難易度を選択してください</h3>
+                    <div className="grid grid-cols-1 gap-4">
+                      <button
+                        onClick={() => { setTopic('BEGINNER'); }}
+                        className={`p-6 rounded-xl text-left transition-all border-2 shadow-md hover:shadow-xl ${
+                          topic === 'BEGINNER'
+                            ? 'bg-green-50 border-green-500 ring-4 ring-green-100'
+                            : 'bg-white border-slate-200 hover:border-green-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xl font-bold">
+                            <i className="fas fa-seedling"></i>
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-bold text-slate-800 text-lg">初級 (Beginner)</div>
+                            <div className="text-sm text-slate-600">Essential Grammar in Use</div>
+                            <div className="text-xs text-slate-500 mt-1">基礎文法: be動詞、現在形、過去形など</div>
+                          </div>
+                          {topic === 'BEGINNER' && (
+                            <i className="fas fa-check-circle text-green-600 text-2xl"></i>
+                          )}
+                        </div>
+                      </button>
+
+                      <button
+                        onClick={() => { setTopic('INTERMEDIATE'); }}
+                        className={`p-6 rounded-xl text-left transition-all border-2 shadow-md hover:shadow-xl ${
+                          topic === 'INTERMEDIATE'
+                            ? 'bg-blue-50 border-blue-500 ring-4 ring-blue-100'
+                            : 'bg-white border-slate-200 hover:border-blue-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl font-bold">
+                            <i className="fas fa-book"></i>
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-bold text-slate-800 text-lg">中級 (Intermediate)</div>
+                            <div className="text-sm text-slate-600">English Grammar in Use</div>
+                            <div className="text-xs text-slate-500 mt-1">完了形、仮定法、関係詞など</div>
+                          </div>
+                          {topic === 'INTERMEDIATE' && (
+                            <i className="fas fa-check-circle text-blue-600 text-2xl"></i>
+                          )}
+                        </div>
+                      </button>
+
+                      <button
+                        onClick={() => { setTopic('ADVANCED'); }}
+                        className={`p-6 rounded-xl text-left transition-all border-2 shadow-md hover:shadow-xl ${
+                          topic === 'ADVANCED'
+                            ? 'bg-purple-50 border-purple-500 ring-4 ring-purple-100'
+                            : 'bg-white border-slate-200 hover:border-purple-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xl font-bold">
+                            <i className="fas fa-crown"></i>
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-bold text-slate-800 text-lg">上級 (Advanced)</div>
+                            <div className="text-sm text-slate-600">Advanced Grammar in Use</div>
+                            <div className="text-xs text-slate-500 mt-1">高度な文法事項、ニュアンスの違いなど</div>
+                          </div>
+                          {topic === 'ADVANCED' && (
+                            <i className="fas fa-check-circle text-purple-600 text-2xl"></i>
+                          )}
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+              )}
+
               <div className="mt-auto">
                 <button
                     onClick={() => onStart(topic, mode)}
-                    disabled={isLoading}
+                    disabled={isLoading || (mode === 'GRAMMAR' && !topic)}
                     className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-xl transition-all transform active:scale-95 flex items-center justify-center gap-3
                     ${isLoading 
                         ? 'bg-slate-400 cursor-wait' 

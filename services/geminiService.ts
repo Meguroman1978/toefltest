@@ -734,3 +734,167 @@ export const generateHistoryAnalysis = async (history: PerformanceRecord[]): Pro
     
     return response.text || "分析データを生成できませんでした。";
 };
+
+/**
+ * Generate Grammar Questions based on Cambridge Grammar principles
+ * @param level - Grammar difficulty level (BEGINNER, INTERMEDIATE, ADVANCED)
+ * @param count - Number of questions to generate (default: 10)
+ */
+export const generateGrammarQuestions = async (
+  level: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED',
+  count: number = 10
+) => {
+  const grammarPointsByLevel = {
+    BEGINNER: [
+      'Present Simple vs Present Continuous',
+      'Past Simple',
+      'be動詞 (am/is/are/was/were)',
+      'have/has',
+      'can/could',
+      '単数形・複数形',
+      '冠詞 (a/an/the)',
+      '前置詞 (in/on/at)',
+      'some/any',
+      'There is/There are'
+    ],
+    INTERMEDIATE: [
+      'Present Perfect',
+      'Past Perfect',
+      'Future forms (will/going to)',
+      '受動態 (Passive Voice)',
+      '関係代名詞 (who/which/that)',
+      '条件文 (If clauses)',
+      '不定詞 vs 動名詞',
+      '比較級・最上級',
+      '仮定法過去',
+      'Modal verbs (must/should/might)'
+    ],
+    ADVANCED: [
+      '完了進行形',
+      '分詞構文',
+      '仮定法過去完了',
+      '関係副詞 (where/when/why)',
+      '強調構文 (It is...that)',
+      '倒置',
+      '省略',
+      'wish/if only',
+      '間接話法',
+      '複雑な時制の一致'
+    ]
+  };
+
+  const bookReference = {
+    BEGINNER: 'Essential Grammar in Use (Cambridge)',
+    INTERMEDIATE: 'English Grammar in Use (Cambridge)',
+    ADVANCED: 'Advanced Grammar in Use (Cambridge)'
+  };
+
+  const grammarPoints = grammarPointsByLevel[level];
+  const selectedPoints = grammarPoints.sort(() => Math.random() - 0.5).slice(0, Math.min(count, grammarPoints.length));
+
+  const grammarQuestionSchema: Schema = {
+    type: Type.OBJECT,
+    properties: {
+      questions: {
+        type: Type.ARRAY,
+        items: {
+          type: Type.OBJECT,
+          properties: {
+            grammarPoint: { type: Type.STRING },
+            question: { type: Type.STRING },
+            options: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  id: { type: Type.STRING },
+                  text: { type: Type.STRING }
+                },
+                required: ['id', 'text']
+              }
+            },
+            correctAnswer: { type: Type.STRING },
+            explanation: { type: Type.STRING },
+            example: { type: Type.STRING }
+          },
+          required: ['grammarPoint', 'question', 'options', 'correctAnswer', 'explanation', 'example']
+        }
+      }
+    },
+    required: ['questions']
+  };
+
+  const prompt = `
+    Generate ${count} grammar questions based on Cambridge Grammar principles.
+    Level: ${level}
+    
+    Grammar Points to Cover:
+    ${selectedPoints.map((p, i) => `${i + 1}. ${p}`).join('\n')}
+    
+    Reference Book: ${bookReference[level]}
+    
+    **REQUIREMENTS:**
+    1. Each question should test ONE specific grammar point
+    2. Provide 4 options (A, B, C, D) with exactly ONE correct answer
+    3. Make distractors realistic and test common mistakes
+    4. Explanation should be clear and in Japanese
+    5. Example sentence should demonstrate correct usage
+    
+    **QUESTION FORMAT:**
+    - Question: A clear sentence with a blank or a grammar correction task
+    - Options: 4 realistic choices
+    - Correct Answer: The option ID (e.g., "opt_0")
+    - Explanation: Why this is correct and why others are wrong (in Japanese)
+    - Example: A natural example sentence using the correct grammar
+    
+    **EXAMPLE (Present Perfect):**
+    Question: "I _____ to Paris three times."
+    Options:
+      A) go
+      B) have gone
+      C) went
+      D) am going
+    Correct: B
+    Explanation: 過去から現在までの経験を表す場合は現在完了形 (have/has + 過去分詞) を使います。"three times"という回数を示す表現と共に使われることが多いです。
+    Example: "She has visited Japan twice."
+    
+    Generate varied question types:
+    - Fill in the blank
+    - Error correction
+    - Choose the correct form
+    - Sentence transformation
+    
+    Make questions progressively challenging within the ${level} level.
+  `;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: MODEL_NAME,
+      contents: prompt,
+      generationConfig: {
+        responseMimeType: 'application/json',
+        responseSchema: grammarQuestionSchema,
+      }
+    });
+
+    const data = JSON.parse(response.text);
+    
+    // Transform to GrammarQuestion format
+    const questions = data.questions.map((q: any, idx: number) => ({
+      id: `grammar_${level}_${Date.now()}_${idx}`,
+      level: level,
+      grammarPoint: q.grammarPoint,
+      question: q.question,
+      options: q.options,
+      correctAnswer: q.correctAnswer,
+      explanation: q.explanation,
+      example: q.example,
+      reference: `${bookReference[level]} - ${q.grammarPoint}`
+    }));
+
+    return questions;
+  } catch (error) {
+    console.error('Grammar generation error:', error);
+    throw new Error('文法問題の生成に失敗しました');
+  }
+};

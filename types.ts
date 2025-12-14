@@ -4,7 +4,7 @@ export enum QuestionType {
   PROSE_SUMMARY = 'PROSE_SUMMARY',
 }
 
-export type TestMode = 'READING' | 'LISTENING' | 'SPEAKING' | 'WRITING' | 'VOCAB_LESSON' | 'FULL_TEST';
+export type TestMode = 'READING' | 'LISTENING' | 'SPEAKING' | 'WRITING' | 'VOCAB_LESSON' | 'GRAMMAR' | 'FULL_TEST';
 
 export interface Option {
   id: string;
@@ -120,4 +120,18 @@ export interface CategoryBreakdown {
   correct: number;
   total: number;
   percentage: number;
+}
+
+export type GrammarLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+
+export interface GrammarQuestion {
+  id: string;
+  level: GrammarLevel;
+  grammarPoint: string; // e.g., "Present Simple", "Past Perfect"
+  question: string;
+  options: Option[];
+  correctAnswer: string;
+  explanation: string;
+  example: string;
+  reference: string; // Book reference (e.g., "Essential Grammar Unit 5")
 }

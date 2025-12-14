@@ -9,8 +9,10 @@ import FeedbackResultScreen from './screens/FeedbackResultScreen';
 import FullTestScreen from './screens/FullTestScreen';
 import ScoreReportScreen from './screens/ScoreReportScreen';
 import PastScoreReportsScreen from './screens/PastScoreReportsScreen';
-import { generateTOEFLSet, generateWritingTask, generateVocabLesson, generateListeningSet, generateSpeakingTask } from './services/geminiService';
-import { Passage, Question, QuestionType, TestMode, WritingTask, PerformanceRecord, ListeningSet, SpeakingTask, ScoreReport, SectionReport } from './types';
+import GrammarTestScreen from './screens/GrammarTestScreen';
+import GrammarResultScreen from './screens/GrammarResultScreen';
+import { generateTOEFLSet, generateWritingTask, generateVocabLesson, generateListeningSet, generateSpeakingTask, generateGrammarQuestions } from './services/geminiService';
+import { Passage, Question, QuestionType, TestMode, WritingTask, PerformanceRecord, ListeningSet, SpeakingTask, ScoreReport, SectionReport, GrammarQuestion, GrammarLevel } from './types';
 
 // Helper to transform raw AI output into safe app state
 const mapGeneratedContentToPassage = (content: any): Passage => {
@@ -48,7 +50,7 @@ const mapGeneratedContentToPassage = (content: any): Passage => {
 };
 
 const App: React.FC = () => {
-  const [screen, setScreen] = useState<'HOME' | 'TEST' | 'WRITING_TEST' | 'LISTENING_TEST' | 'SPEAKING_TEST' | 'RESULT' | 'FEEDBACK_RESULT' | 'FULL_TEST' | 'SCORE_REPORT' | 'PAST_REPORTS'>('HOME');
+  const [screen, setScreen] = useState<'HOME' | 'TEST' | 'WRITING_TEST' | 'LISTENING_TEST' | 'SPEAKING_TEST' | 'RESULT' | 'FEEDBACK_RESULT' | 'FULL_TEST' | 'SCORE_REPORT' | 'PAST_REPORTS' | 'GRAMMAR_TEST' | 'GRAMMAR_RESULT'>('HOME');
   const [isLoading, setIsLoading] = useState(false);
   const [passage, setPassage] = useState<Passage | null>(null);
   const [writingTask, setWritingTask] = useState<WritingTask | null>(null);
@@ -58,6 +60,11 @@ const App: React.FC = () => {
   
   // State for Feedback Result (Speaking/Writing)
   const [feedbackData, setFeedbackData] = useState<{score: number, maxScore: number, feedback: string, type: 'SPEAKING' | 'WRITING', task?: WritingTask | SpeakingTask} | null>(null);
+  
+  // State for Grammar Test
+  const [grammarQuestions, setGrammarQuestions] = useState<GrammarQuestion[]>([]);
+  const [grammarLevel, setGrammarLevel] = useState<GrammarLevel>('INTERMEDIATE');
+  const [grammarResults, setGrammarResults] = useState<{ questionId: string; correct: boolean }[]>([]);
   
   // State for Full Test Mode
   const [fullTestMode, setFullTestMode] = useState(false);
@@ -148,6 +155,8 @@ const App: React.FC = () => {
           startReadingTest(topic, isIntensive, weakCat);
       } else if (mode === 'VOCAB_LESSON') {
           startVocabLesson();
+      } else if (mode === 'GRAMMAR') {
+          startGrammarTest(topic as GrammarLevel);
       } else if (mode === 'WRITING') {
           startWritingTest();
       } else if (mode === 'LISTENING') {
@@ -164,6 +173,27 @@ const App: React.FC = () => {
       setFullTestSection('READING');
       setFullTestScores({});
       setScreen('FULL_TEST');
+  };
+
+  const startGrammarTest = async (level: GrammarLevel) => {
+    setIsLoading(true);
+    try {
+      const questions = await generateGrammarQuestions(level, 10);
+      setGrammarQuestions(questions);
+      setGrammarLevel(level);
+      setGrammarResults([]);
+      setScreen('GRAMMAR_TEST');
+    } catch (error) {
+      console.error('Grammar test generation error:', error);
+      alert('文法テストの生成に失敗しました。もう一度お試しください。');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGrammarComplete = (results: { questionId: string; correct: boolean }[]) => {
+    setGrammarResults(results);
+    setScreen('GRAMMAR_RESULT');
   };
 
   const handleIntensiveTraining = (category: string) => {
@@ -559,6 +589,25 @@ const App: React.FC = () => {
         <PastScoreReportsScreen
           onHome={goHomeForce}
           onViewReport={viewReportDetail}
+        />
+      )}
+
+      {screen === 'GRAMMAR_TEST' && grammarQuestions.length > 0 && (
+        <GrammarTestScreen
+          level={grammarLevel}
+          questions={grammarQuestions}
+          onComplete={handleGrammarComplete}
+          onExit={goHomeSafe}
+        />
+      )}
+
+      {screen === 'GRAMMAR_RESULT' && (
+        <GrammarResultScreen
+          level={grammarLevel}
+          questions={grammarQuestions}
+          results={grammarResults}
+          onHome={goHomeForce}
+          onRetry={() => startGrammarTest(grammarLevel)}
         />
       )}
     </div>
