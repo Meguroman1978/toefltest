@@ -1,5 +1,17 @@
 # TOEFL iBT 2026 New Format Guide
 
+⚠️ **重要な注意**: このドキュメントは2023年の情報に基づいており、**古くなっています**。
+
+**2026年1月21日からの最新公式情報は `TOEFL_2026_FORMAT_OFFICIAL.md` を必ず参照してください。**
+
+主な変更点:
+- テスト時間: 2時間 → **約90分** (大幅短縮)
+- スコア: 0-120のみ → **1-6バンドスコア + 0-120** (2年間併記)
+- Speaking/Writing: タスク形式が**完全に変更**
+- Reading/Listening: **2段階アダプティブ方式**導入
+
+---
+
 ## Overview
 TOEFL iBT transitioned to a shorter, more streamlined format in July 2023, with continuous updates leading to 2026.
 
