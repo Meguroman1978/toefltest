@@ -13,7 +13,10 @@ import {
   needsUpdate as kbNeedsUpdate 
 } from "./youtubeAnalyzer";
 
-const ai = new GoogleGenAI({ apiKey: "AIzaSyBoK-kckzwlPkmusNv3_sFL2GtBkxoQ0xA" });
+// ⚠️ SECURITY NOTE: API Key is embedded here for deployment
+// This file should NOT be committed with the actual API key
+// Before committing, replace with a placeholder or use git update-index --assume-unchanged
+const ai = new GoogleGenAI({ apiKey: "AIzaSyAsnYCSVZC_n09CT7p7O5BCHSHQg8j-_xM" });
 const MODEL_NAME = "gemini-2.0-flash";
 
 // --- SCHEMAS ---
