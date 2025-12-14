@@ -197,7 +197,7 @@ const PastScoreReportsScreen: React.FC<PastScoreReportsScreenProps> = ({ onHome,
   const trends = calculateTrends();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-slate-100 overflow-y-auto p-8">
+    <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-slate-100 overflow-y-auto p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">

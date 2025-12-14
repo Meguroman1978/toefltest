@@ -4,10 +4,12 @@ import { ScoreReport } from '../types';
 interface ScoreReportScreenProps {
   report: ScoreReport;
   onHome: () => void;
+  onBackToReports?: () => void; // Optional callback to return to Past Reports screen
 }
 
-const ScoreReportScreen: React.FC<ScoreReportScreenProps> = ({ report, onHome }) => {
+const ScoreReportScreen: React.FC<ScoreReportScreenProps> = ({ report, onHome, onBackToReports }) => {
   // Use real profile photos from provided images
+  // We use a deterministic selection based on report ID to ensure the same photo appears for the same report
   const profilePhotos = [
     'https://www.genspark.ai/api/files/s/RkniAVJj',
     'https://www.genspark.ai/api/files/s/ILmU31a1',
@@ -15,7 +17,9 @@ const ScoreReportScreen: React.FC<ScoreReportScreenProps> = ({ report, onHome })
     'https://www.genspark.ai/api/files/s/fDzupcx5',
     'https://www.genspark.ai/api/files/s/AdHqekhL'
   ];
-  const profilePhotoUrl = profilePhotos[Math.floor(Math.random() * profilePhotos.length)];
+  // Use report ID to deterministically select a photo (same report = same photo)
+  const photoIndex = report.id ? parseInt(report.id.replace(/\D/g, '')) % profilePhotos.length : Math.floor(Math.random() * profilePhotos.length);
+  const profilePhotoUrl = profilePhotos[photoIndex];
   
   const getScoreColor = (score: number) => {
     if (score >= 24) return 'text-green-600';
@@ -46,7 +50,7 @@ const ScoreReportScreen: React.FC<ScoreReportScreenProps> = ({ report, onHome })
   };
 
   return (
-    <div className="min-h-screen w-full bg-white overflow-y-auto font-sans">
+    <div className="fixed inset-0 w-full bg-white overflow-y-auto font-sans">
       <div className="p-8 max-w-5xl mx-auto">
         {/* Official TOEFL Header */}
         <div className="bg-white border-2 border-slate-300 mb-6">
@@ -55,12 +59,22 @@ const ScoreReportScreen: React.FC<ScoreReportScreenProps> = ({ report, onHome })
             <div className="flex items-center gap-4">
               <div className="text-3xl font-bold">TOEFL iBT®</div>
             </div>
-            <button 
-              onClick={onHome}
-              className="bg-white text-blue-900 px-4 py-2 rounded hover:bg-slate-100 transition-colors text-sm font-semibold"
-            >
-              <i className="fas fa-home mr-2"></i>Return Home
-            </button>
+            <div className="flex gap-3">
+              {onBackToReports && (
+                <button 
+                  onClick={onBackToReports}
+                  className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-colors text-sm font-semibold"
+                >
+                  <i className="fas fa-arrow-left mr-2"></i>Back to Reports
+                </button>
+              )}
+              <button 
+                onClick={onHome}
+                className="bg-white text-blue-900 px-4 py-2 rounded hover:bg-slate-100 transition-colors text-sm font-semibold"
+              >
+                <i className="fas fa-home mr-2"></i>Return Home
+              </button>
+            </div>
           </div>
 
           <div className="px-6 py-4 bg-slate-50 border-b-2 border-slate-300">
@@ -113,11 +127,17 @@ const ScoreReportScreen: React.FC<ScoreReportScreenProps> = ({ report, onHome })
               
               {/* Profile Photo */}
               <div className="flex justify-end">
-                <div className="w-32 h-40 border-2 border-slate-300 bg-slate-50 overflow-hidden">
+                <div className="w-32 h-40 border-2 border-slate-300 bg-slate-100 overflow-hidden flex items-center justify-center">
                   <img 
                     src={profilePhotoUrl} 
                     alt="Test Taker Photo" 
                     className="w-full h-full object-cover"
+                    crossOrigin="anonymous"
+                    onError={(e) => {
+                      // Fallback to a placeholder if image fails to load
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.parentElement!.innerHTML = '<div class="text-center text-slate-400"><i class="fas fa-user text-5xl"></i></div>';
+                    }}
                   />
                 </div>
               </div>

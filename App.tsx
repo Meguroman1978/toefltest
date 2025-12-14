@@ -76,6 +76,7 @@ const App: React.FC = () => {
     writing?: SectionReport;
   }>({});
   const [currentScoreReport, setCurrentScoreReport] = useState<ScoreReport | null>(null);
+  const [previousScreen, setPreviousScreen] = useState<string | null>(null);
 
 
   const startReadingTest = async (topic: string, isIntensive = false, weakCat = "") => {
@@ -459,7 +460,13 @@ const App: React.FC = () => {
 
   const viewReportDetail = (report: ScoreReport) => {
     setCurrentScoreReport(report);
+    setPreviousScreen('PAST_REPORTS'); // Track that we came from past reports
     setScreen('SCORE_REPORT');
+  };
+
+  const backToPastReports = () => {
+    setScreen('PAST_REPORTS');
+    setPreviousScreen(null);
   };
 
   return (
@@ -582,6 +589,7 @@ const App: React.FC = () => {
         <ScoreReportScreen
           report={currentScoreReport}
           onHome={goHomeForce}
+          onBackToReports={previousScreen === 'PAST_REPORTS' ? backToPastReports : undefined}
         />
       )}
 

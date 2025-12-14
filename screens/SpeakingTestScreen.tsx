@@ -18,6 +18,7 @@ const SpeakingTestScreen: React.FC<SpeakingTestScreenProps> = ({ task, onComplet
   const [difficulty, setDifficulty] = useState<Difficulty>('INTERMEDIATE');
   const [timeLeft, setTimeLeft] = useState(0);
   const [transcript, setTranscript] = useState('');
+  const [interimTranscript, setInterimTranscript] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
   const recognitionRef = useRef<any>(null);
 
@@ -118,10 +119,12 @@ const SpeakingTestScreen: React.FC<SpeakingTestScreenProps> = ({ task, onComplet
                   }
               }
               if (final) {
+                  // Only add finalized speech to permanent transcript
                   setTranscript(prev => (prev + " " + final).trim());
+                  setInterimTranscript(''); // Clear interim when we get final
               } else if (interim) {
-                  // Show interim results in real-time
-                  setTranscript(prev => (prev + " " + interim).trim());
+                  // Show interim results separately without adding to final transcript
+                  setInterimTranscript(interim);
               }
           };
           
@@ -280,7 +283,9 @@ const SpeakingTestScreen: React.FC<SpeakingTestScreenProps> = ({ task, onComplet
               <div className="mt-8 relative w-full max-w-lg mx-auto">
                   <div className="absolute top-0 left-0 text-xs font-bold text-slate-500 mb-1">LIVE TRANSCRIPT PREVIEW</div>
                   <div className="p-4 bg-slate-800 rounded text-sm text-left h-32 overflow-y-auto border border-slate-700 text-slate-300">
-                      {transcript || <span className="opacity-30 italic">Listening for speech...</span>}
+                      {transcript && <span>{transcript}</span>}
+                      {interimTranscript && <span className="text-blue-400 italic"> {interimTranscript}</span>}
+                      {!transcript && !interimTranscript && <span className="opacity-30 italic">Listening for speech...</span>}
                   </div>
               </div>
           </div>
