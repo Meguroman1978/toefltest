@@ -155,6 +155,21 @@ const PastScoreReportsScreen: React.FC<PastScoreReportsScreenProps> = ({ onHome,
     return <span className="text-slate-600">→ 0</span>;
   };
 
+  const handleDelete = (index: number) => {
+    if (window.confirm('このスコアレポートを削除しますか？')) {
+      const updatedReports = reports.filter((_, i) => i !== index);
+      setReports(updatedReports);
+      localStorage.setItem('toefl_score_reports', JSON.stringify(updatedReports));
+    }
+  };
+
+  const handleClearAll = () => {
+    if (window.confirm('すべてのスコアレポートを削除しますか？この操作は取り消せません。')) {
+      setReports([]);
+      localStorage.removeItem('toefl_score_reports');
+    }
+  };
+
   if (reports.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-slate-100 p-8">
@@ -191,12 +206,20 @@ const PastScoreReportsScreen: React.FC<PastScoreReportsScreenProps> = ({ onHome,
               <h1 className="text-4xl font-extrabold text-slate-800 mb-2">📊 過去のスコアレポート</h1>
               <p className="text-slate-600">全{reports.length}回のFull Test受講履歴</p>
             </div>
-            <button
-              onClick={onHome}
-              className="bg-slate-800 text-white px-6 py-3 rounded-lg hover:bg-slate-900 transition-colors font-bold shadow-lg"
-            >
-              <i className="fas fa-home mr-2"></i>ホームに戻る
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={handleClearAll}
+                className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-bold shadow-lg"
+              >
+                <i className="fas fa-trash mr-2"></i>すべて削除
+              </button>
+              <button
+                onClick={onHome}
+                className="bg-slate-800 text-white px-6 py-3 rounded-lg hover:bg-slate-900 transition-colors font-bold shadow-lg"
+              >
+                <i className="fas fa-home mr-2"></i>ホームに戻る
+              </button>
+            </div>
           </div>
 
           {/* Average Scores Summary */}
@@ -289,12 +312,21 @@ const PastScoreReportsScreen: React.FC<PastScoreReportsScreenProps> = ({ onHome,
                   </div>
                 </div>
 
-                <button
-                  onClick={() => onViewReport(report)}
-                  className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-sm"
-                >
-                  <i className="fas fa-eye mr-2"></i>詳細レポートを見る
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => onViewReport(report)}
+                    className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-sm"
+                  >
+                    <i className="fas fa-eye mr-2"></i>詳細レポートを見る
+                  </button>
+                  <button
+                    onClick={() => handleDelete(index)}
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors font-semibold text-sm"
+                    title="削除"
+                  >
+                    <i className="fas fa-trash"></i>
+                  </button>
+                </div>
               </div>
             );
           })}
@@ -315,7 +347,7 @@ const PastScoreReportsScreen: React.FC<PastScoreReportsScreenProps> = ({ onHome,
               <p className="text-slate-600 mt-4">データを分析中...</p>
             </div>
           ) : (
-            <div className="prose prose-slate max-w-none">
+            <div className="prose prose-slate max-w-none max-h-[600px] overflow-y-auto pr-4 custom-scroll">
               <div className="whitespace-pre-wrap text-slate-700 leading-relaxed">
                 {analysis.split('\n').map((line, index) => {
                   if (line.startsWith('## ')) {

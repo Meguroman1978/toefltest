@@ -109,12 +109,20 @@ const SpeakingTestScreen: React.FC<SpeakingTestScreenProps> = ({ task, onComplet
           
           recognitionRef.current.onresult = (event: any) => {
               let final = '';
+              let interim = '';
               for (let i = event.resultIndex; i < event.results.length; ++i) {
                   if (event.results[i].isFinal) {
                       final += event.results[i][0].transcript;
+                  } else {
+                      interim += event.results[i][0].transcript;
                   }
               }
-              setTranscript(prev => prev + " " + final);
+              if (final) {
+                  setTranscript(prev => (prev + " " + final).trim());
+              } else if (interim) {
+                  // Show interim results in real-time
+                  setTranscript(prev => (prev + " " + interim).trim());
+              }
           };
           
           recognitionRef.current.onerror = (event: any) => {

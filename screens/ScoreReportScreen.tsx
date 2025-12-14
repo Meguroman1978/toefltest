@@ -7,10 +7,15 @@ interface ScoreReportScreenProps {
 }
 
 const ScoreReportScreen: React.FC<ScoreReportScreenProps> = ({ report, onHome }) => {
-  // Generate random profile photo seed (persons 1-5 equivalent)
-  const profileSeeds = ['person1', 'person2', 'person3', 'person4', 'person5'];
-  const randomSeed = profileSeeds[Math.floor(Math.random() * profileSeeds.length)];
-  const profilePhotoUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${randomSeed}`;
+  // Use real profile photos from provided images
+  const profilePhotos = [
+    'https://www.genspark.ai/api/files/s/RkniAVJj',
+    'https://www.genspark.ai/api/files/s/ILmU31a1',
+    'https://www.genspark.ai/api/files/s/DGuTzy5t',
+    'https://www.genspark.ai/api/files/s/fDzupcx5',
+    'https://www.genspark.ai/api/files/s/AdHqekhL'
+  ];
+  const profilePhotoUrl = profilePhotos[Math.floor(Math.random() * profilePhotos.length)];
   
   const getScoreColor = (score: number) => {
     if (score >= 24) return 'text-green-600';
