@@ -7,10 +7,11 @@ import KnowledgeUpdateScreen from './KnowledgeUpdateScreen';
 
 interface HomeScreenProps {
   onStart: (topic: string, mode: TestMode, isIntensive?: boolean, weakCat?: string) => void;
+  onShowPastReports: () => void;
   isLoading: boolean;
 }
 
-const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, isLoading }) => {
+const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, onShowPastReports, isLoading }) => {
   const [topic, setTopic] = useState('');
   const [mode, setMode] = useState<TestMode>('READING');
   const [showHistory, setShowHistory] = useState(false);
@@ -269,7 +270,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, isLoading }) => {
                 </button>
                 
                 <button 
-                    onClick={() => { /* TODO: Show Score Reports */ }}
+                    onClick={onShowPastReports}
                     className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs font-bold transition-colors flex justify-center items-center gap-2"
                 >
                     <i className="fas fa-file-alt"></i> 過去のスコアレポート

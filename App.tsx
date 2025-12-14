@@ -8,6 +8,7 @@ import ResultScreen from './screens/ResultScreen';
 import FeedbackResultScreen from './screens/FeedbackResultScreen';
 import FullTestScreen from './screens/FullTestScreen';
 import ScoreReportScreen from './screens/ScoreReportScreen';
+import PastScoreReportsScreen from './screens/PastScoreReportsScreen';
 import { generateTOEFLSet, generateWritingTask, generateVocabLesson, generateListeningSet, generateSpeakingTask } from './services/geminiService';
 import { Passage, Question, QuestionType, TestMode, WritingTask, PerformanceRecord, ListeningSet, SpeakingTask, ScoreReport, SectionReport } from './types';
 
@@ -47,7 +48,7 @@ const mapGeneratedContentToPassage = (content: any): Passage => {
 };
 
 const App: React.FC = () => {
-  const [screen, setScreen] = useState<'HOME' | 'TEST' | 'WRITING_TEST' | 'LISTENING_TEST' | 'SPEAKING_TEST' | 'RESULT' | 'FEEDBACK_RESULT' | 'FULL_TEST' | 'SCORE_REPORT'>('HOME');
+  const [screen, setScreen] = useState<'HOME' | 'TEST' | 'WRITING_TEST' | 'LISTENING_TEST' | 'SPEAKING_TEST' | 'RESULT' | 'FEEDBACK_RESULT' | 'FULL_TEST' | 'SCORE_REPORT' | 'PAST_REPORTS'>('HOME');
   const [isLoading, setIsLoading] = useState(false);
   const [passage, setPassage] = useState<Passage | null>(null);
   const [writingTask, setWritingTask] = useState<WritingTask | null>(null);
@@ -422,9 +423,18 @@ const App: React.FC = () => {
     }
   };
 
+  const showPastReports = () => {
+    setScreen('PAST_REPORTS');
+  };
+
+  const viewReportDetail = (report: ScoreReport) => {
+    setCurrentScoreReport(report);
+    setScreen('SCORE_REPORT');
+  };
+
   return (
     <div className="text-slate-900">
-      {screen === 'HOME' && <HomeScreen onStart={handleStart} isLoading={isLoading} />}
+      {screen === 'HOME' && <HomeScreen onStart={handleStart} onShowPastReports={showPastReports} isLoading={isLoading} />}
       
       {screen === 'TEST' && passage && (
         <TestScreen 
@@ -542,6 +552,13 @@ const App: React.FC = () => {
         <ScoreReportScreen
           report={currentScoreReport}
           onHome={goHomeForce}
+        />
+      )}
+
+      {screen === 'PAST_REPORTS' && (
+        <PastScoreReportsScreen
+          onHome={goHomeForce}
+          onViewReport={viewReportDetail}
         />
       )}
     </div>

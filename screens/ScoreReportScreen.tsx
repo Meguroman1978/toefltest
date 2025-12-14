@@ -41,80 +41,152 @@ const ScoreReportScreen: React.FC<ScoreReportScreenProps> = ({ report, onHome })
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 to-slate-100 overflow-y-auto font-sans">
-      <div className="p-8 max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 border-t-8 border-blue-600">
-          <div className="flex justify-between items-start mb-6">
-            <div className="flex items-center gap-6">
-              {/* Profile Photo */}
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 p-1 shadow-xl flex-shrink-0">
-                <div className="w-full h-full rounded-full bg-white overflow-hidden">
-                  <img 
-                    src={profilePhotoUrl} 
-                    alt="Student Profile" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <h1 className="text-4xl font-extrabold text-slate-800 mb-2">TOEFL Score Report</h1>
-                <p className="text-slate-500">
-                  Test Date: {new Date(report.date).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
-                </p>
-                <p className="text-xs text-slate-400 mt-1">Report ID: {report.id}</p>
-              </div>
+    <div className="min-h-screen w-full bg-white overflow-y-auto font-sans">
+      <div className="p-8 max-w-5xl mx-auto">
+        {/* Official TOEFL Header */}
+        <div className="bg-white border-2 border-slate-300 mb-6">
+          {/* Logo and Title Bar */}
+          <div className="bg-blue-900 text-white px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="text-3xl font-bold">TOEFL iBT®</div>
             </div>
             <button 
               onClick={onHome}
-              className="bg-slate-800 text-white px-6 py-3 rounded-lg hover:bg-slate-900 transition-colors font-bold shadow-lg"
+              className="bg-white text-blue-900 px-4 py-2 rounded hover:bg-slate-100 transition-colors text-sm font-semibold"
             >
               <i className="fas fa-home mr-2"></i>Return Home
             </button>
           </div>
 
-          {/* Total Score Display */}
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 text-white mb-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-blue-100 text-sm uppercase tracking-wide mb-2">Total Score</p>
-                <div className="text-7xl font-extrabold mb-2">{report.totalScore}</div>
-                <p className="text-blue-100 text-lg">{getTotalScoreLevel(report.totalScore)}</p>
-              </div>
-              <div className="text-right">
-                <div className="text-5xl mb-4">🎓</div>
-                <p className="text-blue-100">Out of 120</p>
-              </div>
-            </div>
+          <div className="px-6 py-4 bg-slate-50 border-b-2 border-slate-300">
+            <h1 className="text-2xl font-bold text-slate-800">Test Taker Score Report</h1>
           </div>
 
-          {/* Section Scores */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { key: 'reading', label: 'Reading', icon: 'fa-book-open', score: report.readingScore },
-              { key: 'listening', label: 'Listening', icon: 'fa-headphones', score: report.listeningScore },
-              { key: 'speaking', label: 'Speaking', icon: 'fa-microphone', score: report.speakingScore },
-              { key: 'writing', label: 'Writing', icon: 'fa-pen', score: report.writingScore },
-            ].map(section => (
-              <div 
-                key={section.key}
-                className={`rounded-xl p-6 border-2 ${getScoreBgColor(section.score)} transition-all hover:shadow-lg`}
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <i className={`fas ${section.icon} text-2xl ${getScoreColor(section.score)}`}></i>
-                  <p className="font-bold text-slate-700">{section.label}</p>
+          {/* Student Information Table */}
+          <div className="p-6">
+            <div className="grid grid-cols-3 gap-6 mb-6">
+              <div className="col-span-2 space-y-3">
+                <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                  <div>
+                    <div className="font-semibold text-slate-700">Name:</div>
+                    <div className="text-slate-900">Test Taker</div>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-slate-700">Test Date:</div>
+                    <div className="text-slate-900">
+                      {new Date(report.date).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-slate-700">Registration Number:</div>
+                    <div className="text-slate-900">{report.id}</div>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-slate-700">Report Date:</div>
+                    <div className="text-slate-900">
+                      {new Date().toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-slate-700">Native Language:</div>
+                    <div className="text-slate-900">Japanese</div>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-slate-700">Test Center:</div>
+                    <div className="text-slate-900">Online Practice</div>
+                  </div>
                 </div>
-                <div className={`text-5xl font-extrabold mb-1 ${getScoreColor(section.score)}`}>
-                  {section.score}
-                </div>
-                <p className="text-xs text-slate-500">/ 30 - {getScoreLevel(section.score)}</p>
               </div>
-            ))}
+              
+              {/* Profile Photo */}
+              <div className="flex justify-end">
+                <div className="w-32 h-40 border-2 border-slate-300 bg-slate-50 overflow-hidden">
+                  <img 
+                    src={profilePhotoUrl} 
+                    alt="Test Taker Photo" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Scores Table */}
+            <div className="border-2 border-slate-300 mt-6">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-slate-100 border-b-2 border-slate-300">
+                    <th className="text-left py-3 px-4 font-bold text-slate-800 text-sm">SECTION</th>
+                    <th className="text-center py-3 px-4 font-bold text-slate-800 text-sm">SCORE</th>
+                    <th className="text-center py-3 px-4 font-bold text-slate-800 text-sm">LEVEL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-slate-200">
+                    <td className="py-3 px-4 font-semibold text-slate-700">Reading</td>
+                    <td className="py-3 px-4 text-center">
+                      <span className={`text-2xl font-bold ${getScoreColor(report.readingScore)}`}>
+                        {report.readingScore}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-center text-sm text-slate-600">
+                      {getScoreLevel(report.readingScore)}
+                    </td>
+                  </tr>
+                  <tr className="border-b border-slate-200">
+                    <td className="py-3 px-4 font-semibold text-slate-700">Listening</td>
+                    <td className="py-3 px-4 text-center">
+                      <span className={`text-2xl font-bold ${getScoreColor(report.listeningScore)}`}>
+                        {report.listeningScore}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-center text-sm text-slate-600">
+                      {getScoreLevel(report.listeningScore)}
+                    </td>
+                  </tr>
+                  <tr className="border-b border-slate-200">
+                    <td className="py-3 px-4 font-semibold text-slate-700">Speaking</td>
+                    <td className="py-3 px-4 text-center">
+                      <span className={`text-2xl font-bold ${getScoreColor(report.speakingScore)}`}>
+                        {report.speakingScore}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-center text-sm text-slate-600">
+                      {getScoreLevel(report.speakingScore)}
+                    </td>
+                  </tr>
+                  <tr className="border-b-2 border-slate-300">
+                    <td className="py-3 px-4 font-semibold text-slate-700">Writing</td>
+                    <td className="py-3 px-4 text-center">
+                      <span className={`text-2xl font-bold ${getScoreColor(report.writingScore)}`}>
+                        {report.writingScore}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-center text-sm text-slate-600">
+                      {getScoreLevel(report.writingScore)}
+                    </td>
+                  </tr>
+                  <tr className="bg-blue-50">
+                    <td className="py-4 px-4 font-bold text-slate-800 text-lg">TOTAL SCORE</td>
+                    <td className="py-4 px-4 text-center">
+                      <span className="text-4xl font-extrabold text-blue-900">
+                        {report.totalScore}
+                      </span>
+                    </td>
+                    <td className="py-4 px-4 text-center text-sm font-semibold text-slate-700">
+                      {getTotalScoreLevel(report.totalScore)}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
