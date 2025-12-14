@@ -7,6 +7,11 @@ interface ScoreReportScreenProps {
 }
 
 const ScoreReportScreen: React.FC<ScoreReportScreenProps> = ({ report, onHome }) => {
+  // Generate random profile photo seed (persons 1-5 equivalent)
+  const profileSeeds = ['person1', 'person2', 'person3', 'person4', 'person5'];
+  const randomSeed = profileSeeds[Math.floor(Math.random() * profileSeeds.length)];
+  const profilePhotoUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${randomSeed}`;
+  
   const getScoreColor = (score: number) => {
     if (score >= 24) return 'text-green-600';
     if (score >= 18) return 'text-blue-600';
@@ -41,16 +46,29 @@ const ScoreReportScreen: React.FC<ScoreReportScreenProps> = ({ report, onHome })
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 border-t-8 border-blue-600">
           <div className="flex justify-between items-start mb-6">
-            <div>
-              <h1 className="text-4xl font-extrabold text-slate-800 mb-2">TOEFL Score Report</h1>
-              <p className="text-slate-500">
-                Test Date: {new Date(report.date).toLocaleDateString('en-US', { 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}
-              </p>
-              <p className="text-xs text-slate-400 mt-1">Report ID: {report.id}</p>
+            <div className="flex items-center gap-6">
+              {/* Profile Photo */}
+              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 p-1 shadow-xl flex-shrink-0">
+                <div className="w-full h-full rounded-full bg-white overflow-hidden">
+                  <img 
+                    src={profilePhotoUrl} 
+                    alt="Student Profile" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <h1 className="text-4xl font-extrabold text-slate-800 mb-2">TOEFL Score Report</h1>
+                <p className="text-slate-500">
+                  Test Date: {new Date(report.date).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}
+                </p>
+                <p className="text-xs text-slate-400 mt-1">Report ID: {report.id}</p>
+              </div>
             </div>
             <button 
               onClick={onHome}
