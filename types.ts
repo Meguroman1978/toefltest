@@ -88,3 +88,36 @@ export interface GeneratedContent {
   paragraphs: string[];
   questions: any[];
 }
+
+export interface ScoreReport {
+  id: string;
+  date: string;
+  readingScore: number; // 0-30
+  listeningScore: number; // 0-30
+  speakingScore: number; // 0-30
+  writingScore: number; // 0-30
+  totalScore: number; // 0-120
+  sections: {
+    reading: SectionReport;
+    listening: SectionReport;
+    speaking: SectionReport;
+    writing: SectionReport;
+  };
+}
+
+export interface SectionReport {
+  score: number;
+  maxScore: number;
+  rawScore: number;
+  correctAnswers: number;
+  totalQuestions: number;
+  timeSpent: number; // in seconds
+  breakdown: CategoryBreakdown[];
+}
+
+export interface CategoryBreakdown {
+  category: string;
+  correct: number;
+  total: number;
+  percentage: number;
+}

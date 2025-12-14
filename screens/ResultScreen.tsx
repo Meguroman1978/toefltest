@@ -1,17 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { Passage, QuestionType } from '../types';
+import React, { useEffect, useState, useRef } from 'react';
+import { Passage, QuestionType, ListeningSet } from '../types';
 import { generatePerformanceAnalysis } from '../services/geminiService';
+import { speakText, stopAudio } from '../utils/audio';
 
 interface ResultScreenProps {
   passage: Passage;
   answers: Record<string, string[]>;
   onHome: () => void;
+  listeningSet?: ListeningSet; // Optional listening data for audio replay
 }
 
-const ResultScreen: React.FC<ResultScreenProps> = ({ passage, answers, onHome }) => {
+const ResultScreen: React.FC<ResultScreenProps> = ({ passage, answers, onHome, listeningSet }) => {
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [categoryStats, setCategoryStats] = useState<Record<string, { total: number, correct: number }>>({});
+  const [hoveredQuestionId, setHoveredQuestionId] = useState<string | null>(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const passageContentRef = useRef<HTMLDivElement>(null);
   
   // Check if this is Vocab Lesson mode
   const isVocabLesson = passage.questions.some(q => q.categoryLabel === "語彙・熟語特訓");
@@ -113,88 +119,211 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ passage, answers, onHome })
 
   const { score, maxScore, percentage } = calculateScore();
 
-  return (
-    <div className="h-screen w-full bg-slate-50 overflow-y-auto font-sans">
-      <div className="p-4 md:p-8 max-w-6xl mx-auto pb-24">
-        
-        {/* Header Card */}
-        <div className="bg-white rounded-xl shadow-lg p-8 mb-6 text-center border-t-8 border-blue-600 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-100 rounded-bl-full opacity-50 -mr-10 -mt-10"></div>
-          <h1 className="text-3xl font-bold text-slate-800 mb-2">Test Results</h1>
-          <p className="text-slate-500 mb-8 font-serif italic text-lg">{passage.title}</p>
-          
-          <div className="flex flex-col md:flex-row justify-center items-center gap-8 md:gap-16 mb-8">
-            <div className="text-center">
-              <div className="text-6xl font-extrabold text-blue-600 mb-2">{score}<span className="text-3xl text-slate-300 font-normal">/{maxScore}</span></div>
-              <div className="text-xs tracking-widest text-slate-500 font-bold uppercase">Raw Score</div>
-            </div>
-            <div className="hidden md:block w-px h-24 bg-slate-200"></div>
-            <div className="text-center">
-              <div className={`text-6xl font-extrabold mb-2 ${percentage >= 80 ? 'text-emerald-500' : percentage >= 60 ? 'text-amber-500' : 'text-rose-500'}`}>
-                {percentage}%
-              </div>
-              <div className="text-xs tracking-widest text-slate-500 font-bold uppercase">Accuracy</div>
-            </div>
-          </div>
+  const playListeningAudio = () => {
+    if (listeningSet && listeningSet.transcript) {
+      setIsPlayingAudio(true);
+      speakText(listeningSet.transcript, 1.0, () => {
+        setIsPlayingAudio(false);
+      });
+    }
+  };
 
-          <div className="flex justify-center gap-4">
-            <button onClick={onHome} className="bg-slate-800 text-white px-8 py-3 rounded-full hover:bg-slate-900 transition-colors font-bold shadow-lg">
-              Return Home
+  const stopListeningAudio = () => {
+    stopAudio();
+    setIsPlayingAudio(false);
+  };
+
+  const highlightRelevantText = (text: string, keywords: string[]) => {
+    if (!keywords || keywords.length === 0) return text;
+    
+    let highlighted = text;
+    keywords.forEach(keyword => {
+      if (keyword && keyword.length > 2) {
+        const regex = new RegExp(`(${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        highlighted = highlighted.replace(regex, '<mark class="bg-yellow-300 px-1 rounded">$1</mark>');
+      }
+    });
+    return highlighted;
+  };
+
+  const currentQuestion = passage.questions[currentQuestionIndex];
+
+  return (
+    <div className="h-screen w-full bg-slate-50 flex flex-col font-sans">
+      {/* Header Bar */}
+      <div className="bg-white shadow-md px-6 py-4 border-b-2 border-blue-600 flex-shrink-0">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-800">Test Results</h1>
+            <p className="text-slate-500 text-sm">{passage.title}</p>
+          </div>
+          <div className="flex items-center gap-6">
+            <div className="text-right">
+              <div className="text-3xl font-bold text-blue-600">{score}<span className="text-xl text-slate-400">/{maxScore}</span></div>
+              <div className="text-xs text-slate-500">Accuracy: {percentage}%</div>
+            </div>
+            <button onClick={onHome} className="bg-slate-800 text-white px-6 py-2 rounded-lg hover:bg-slate-900 transition-colors font-medium shadow-md">
+              <i className="fas fa-home mr-2"></i>Home
             </button>
           </div>
         </div>
+      </div>
 
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-            {/* Category Chart */}
-            <div className="bg-white rounded-xl shadow-md p-6">
-                <h3 className="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Category Breakdown</h3>
-                <div className="space-y-4">
-                    {Object.entries(categoryStats).map(([cat, val]) => {
-                        const stat = val as { total: number, correct: number };
-                        const pct = Math.round((stat.correct / stat.total) * 100);
-                        return (
-                            <div key={cat}>
-                                <div className="flex justify-between text-sm mb-1">
-                                    <span className="font-medium text-slate-700">{cat}</span>
-                                    <span className="text-slate-500">{stat.correct}/{stat.total} ({pct}%)</span>
-                                </div>
-                                <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                                    <div 
-                                        className={`h-full rounded-full ${pct >= 80 ? 'bg-emerald-500' : pct >= 50 ? 'bg-yellow-500' : 'bg-red-500'}`}
-                                        style={{ width: `${pct}%` }}
-                                    ></div>
-                                </div>
-                            </div>
-                        )
-                    })}
+      {/* Split View Layout */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* LEFT: Problem Content */}
+        <div className="w-1/2 bg-white border-r-2 border-slate-200 overflow-y-auto" ref={passageContentRef}>
+          <div className="p-8">
+            <div className="mb-6 flex justify-between items-center">
+              <h2 className="text-xl font-bold text-slate-800">
+                {listeningSet ? (
+                  <>
+                    <i className="fas fa-headphones mr-2 text-blue-600"></i>
+                    Listening Content
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-book-open mr-2 text-blue-600"></i>
+                    Reading Passage
+                  </>
+                )}
+              </h2>
+              {listeningSet && (
+                <button 
+                  onClick={isPlayingAudio ? stopListeningAudio : playListeningAudio}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    isPlayingAudio 
+                      ? 'bg-red-500 hover:bg-red-600 text-white' 
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  }`}
+                >
+                  <i className={`fas ${isPlayingAudio ? 'fa-stop' : 'fa-play'} mr-2`}></i>
+                  {isPlayingAudio ? 'Stop Audio' : 'Replay Audio'}
+                </button>
+              )}
+            </div>
+
+            {listeningSet ? (
+              <div className="space-y-4">
+                <div className="bg-slate-50 rounded-lg p-6 border border-slate-200">
+                  <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">English Transcript</h3>
+                  <div 
+                    className="text-slate-700 leading-relaxed whitespace-pre-wrap font-serif"
+                    dangerouslySetInnerHTML={{
+                      __html: hoveredQuestionId && currentQuestion.relevantContext
+                        ? highlightRelevantText(listeningSet.transcript, [currentQuestion.relevantContext])
+                        : listeningSet.transcript
+                    }}
+                  />
                 </div>
+                {listeningSet.japaneseTranscript && (
+                  <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
+                    <h3 className="text-sm font-bold text-blue-700 uppercase tracking-wide mb-3">Japanese Translation</h3>
+                    <div className="text-slate-700 leading-relaxed whitespace-pre-wrap">
+                      {listeningSet.japaneseTranscript}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-6 font-serif text-lg leading-relaxed text-slate-700">
+                {passage.paragraphs.map((para, idx) => {
+                  const isHighlighted = hoveredQuestionId && currentQuestion.paragraphReference === idx;
+                  const cleanText = para.replace(/(\[\s*■\s*\]|\[\u25A0\]|■)/g, '');
+                  
+                  return (
+                    <div 
+                      key={idx} 
+                      className={`relative transition-all duration-300 ${
+                        isHighlighted ? 'bg-yellow-100 rounded-lg p-4 border-l-4 border-yellow-400 shadow-sm' : ''
+                      }`}
+                    >
+                      <span className="absolute -left-6 top-1 text-xs text-slate-300 font-sans font-bold">{idx + 1}</span>
+                      <div 
+                        dangerouslySetInnerHTML={{
+                          __html: isHighlighted && currentQuestion.relevantContext
+                            ? highlightRelevantText(cleanText, [currentQuestion.relevantContext])
+                            : cleanText
+                        }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* RIGHT: Questions & Answers */}
+        <div className="w-1/2 bg-slate-50 overflow-y-auto">
+          <div className="p-8">
+        
+            {/* Quick Stats */}
+            <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+              <h3 className="text-lg font-bold text-slate-800 mb-4">Performance Summary</h3>
+              <div className="grid grid-cols-2 gap-4">
+                {Object.entries(categoryStats).map(([cat, val]) => {
+                  const stat = val as { total: number, correct: number };
+                  const pct = Math.round((stat.correct / stat.total) * 100);
+                  return (
+                    <div key={cat} className="text-center p-3 bg-slate-50 rounded-lg">
+                      <div className={`text-2xl font-bold ${pct >= 80 ? 'text-emerald-600' : pct >= 50 ? 'text-amber-600' : 'text-rose-600'}`}>
+                        {pct}%
+                      </div>
+                      <div className="text-xs text-slate-600 mt-1">{cat}</div>
+                      <div className="text-xs text-slate-400">{stat.correct}/{stat.total}</div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
             {/* AI Analysis */}
-            <div className="bg-gradient-to-br from-indigo-50 to-white rounded-xl shadow-md border border-indigo-100 p-6">
+            <div className="bg-gradient-to-br from-indigo-50 to-white rounded-xl shadow-md border border-indigo-100 p-6 mb-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center">
                   <i className="fas fa-robot"></i>
                 </div>
-                <h2 className="text-xl font-bold text-indigo-900">AI Performance Coach</h2>
+                <h2 className="text-lg font-bold text-indigo-900">AI Performance Coach</h2>
               </div>
               
               {isAnalyzing ? (
                 <div className="flex flex-col items-center justify-center py-8 text-indigo-400">
                   <i className="fas fa-spinner fa-spin text-3xl mb-3"></i>
-                  <p>Generating personalized advice...</p>
+                  <p className="text-sm">Generating personalized advice...</p>
                 </div>
               ) : (
-                <div className="prose prose-indigo max-w-none text-slate-700 whitespace-pre-wrap leading-relaxed text-sm h-64 overflow-y-auto custom-scroll">
+                <div className="prose prose-sm max-w-none text-slate-700 whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto custom-scroll">
                   {analysis}
                 </div>
               )}
             </div>
-        </div>
+
+            {/* Question Navigation */}
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-slate-800">
+                Question {currentQuestionIndex + 1} of {passage.questions.length}
+              </h2>
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1))}
+                  disabled={currentQuestionIndex === 0}
+                  className="px-4 py-2 bg-slate-200 hover:bg-slate-300 disabled:bg-slate-100 disabled:text-slate-400 rounded-lg transition-colors"
+                >
+                  <i className="fas fa-chevron-left"></i> Previous
+                </button>
+                <button 
+                  onClick={() => setCurrentQuestionIndex(Math.min(passage.questions.length - 1, currentQuestionIndex + 1))}
+                  disabled={currentQuestionIndex === passage.questions.length - 1}
+                  className="px-4 py-2 bg-slate-200 hover:bg-slate-300 disabled:bg-slate-100 disabled:text-slate-400 rounded-lg transition-colors"
+                >
+                  Next <i className="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
 
         {/* Detailed Review */}
-        <h2 className="text-2xl font-bold text-slate-800 mb-6 pl-2 border-l-4 border-blue-500">Detailed Review</h2>
-        <div className="space-y-8">
+        <div className="space-y-6">
           
           {passage.questions.map((q, idx) => {
             const userAns = answers[q.id] || [];
@@ -209,8 +338,16 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ passage, answers, onHome })
                isCorrect = userAns.length > 0 && correctAns.includes(userAns[0]);
             }
 
+            // Only show current question
+            if (idx !== currentQuestionIndex) return null;
+
             return (
-              <div key={q.id} className={`bg-white rounded-xl shadow-sm border overflow-hidden ${isCorrect ? 'border-emerald-200' : 'border-rose-200'}`}>
+              <div 
+                key={q.id} 
+                className={`bg-white rounded-xl shadow-sm border overflow-hidden ${isCorrect ? 'border-emerald-200' : 'border-rose-200'}`}
+                onMouseEnter={() => setHoveredQuestionId(q.id)}
+                onMouseLeave={() => setHoveredQuestionId(null)}
+              >
                 
                 {/* Question Header */}
                 <div className={`px-6 py-4 flex justify-between items-center ${isCorrect ? 'bg-emerald-50/50' : 'bg-rose-50/50'}`}>
@@ -228,12 +365,12 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ passage, answers, onHome })
                     </div>
                   </div>
                   <div className={`font-bold px-3 py-1 rounded text-sm ${isCorrect ? 'text-emerald-700 bg-emerald-100' : 'text-rose-700 bg-rose-100'}`}>
-                    {isCorrect ? 'Correct' : 'Incorrect'}
+                    {isCorrect ? 'Correct ✓' : 'Incorrect ✗'}
                   </div>
                 </div>
 
                 <div className="p-6 md:p-8">
-                   <p className="text-lg text-slate-900 font-medium mb-6">{q.prompt}</p>
+                   <p className="text-base text-slate-900 font-medium mb-6">{q.prompt}</p>
 
                    <div className="space-y-2 mb-8">
                     {q.options.map(opt => {
@@ -293,6 +430,8 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ passage, answers, onHome })
               </div>
             );
           })}
+        </div>
+          </div>
         </div>
       </div>
     </div>

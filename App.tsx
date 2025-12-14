@@ -307,7 +307,8 @@ const App: React.FC = () => {
         <ResultScreen 
           passage={passage} 
           answers={userAnswers} 
-          onHome={goHomeForce} 
+          onHome={goHomeForce}
+          listeningSet={listeningSet || undefined}
         />
       )}
 
