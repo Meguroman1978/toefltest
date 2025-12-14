@@ -482,25 +482,177 @@ Respond in JSON format with keys: academic, daily, business, political
 // --- GRADING & ANALYSIS ---
 
 export const gradeWritingResponse = async (task: WritingTask, userResponse: string): Promise<{ score: number, feedback: string }> => {
+    const isIntegrated = task.type === 'INTEGRATED';
+    
     const prompt = `
-      Act as a certified TOEFL iBT Writing Rater.
+      Act as a certified TOEFL iBT Writing Rater using the OFFICIAL ETS TOEFL Scoring Rubric.
       
-      **Task**: ${task.type}
+      **Task Type**: ${task.type}
       **Question**: ${task.question}
       
-      **Rubric Criteria**:
-      1. **Development**: Is the idea well-developed? (Integrated: Did they accurately connect Reading & Listening?)
-      2. **Organization**: Is there a clear structure (Intro, Body, Conclusion)?
-      3. **Language Use**: Grammar, vocabulary variety, sentence complexity.
+      **OFFICIAL TOEFL iBT WRITING RUBRIC (0-5 Scale)**:
       
-      **Inputs**:
-      - Reading Source: ${task.reading || "N/A"}
-      - Listening Source: ${task.listeningTranscript || "N/A"}
-      - User Essay: "${userResponse}"
+      ${isIntegrated ? `
+      **INTEGRATED WRITING TASK RUBRIC**:
       
-      **Output**:
-      1. Estimated Scaled Score (0-5).
-      2. Actionable Feedback in Japanese (Start DIRECTLY with "Good points" or feedback content, NO greeting phrases).
+      **SCORE 5 (High)**
+      • Successfully selects important information from lecture and presents it coherently in relation to reading
+      • Well organized; occasional language errors do not result in inaccurate presentation of content
+      • Minor lexical or grammatical errors
+      
+      **SCORE 4 (Good)**
+      • Generally good in selecting important information and presenting it in relation to reading
+      • Coherent; minor omissions or inaccuracies acceptable
+      • Some language errors but meaning generally clear
+      
+      **SCORE 3 (Fair)**
+      • Contains some important information but may have omissions or inaccuracies
+      • May omit key point or contain vague/incorrect information
+      • Errors may obscure connections or meaning
+      
+      **SCORE 2 (Limited)**
+      • Contains some relevant information but significant omissions/inaccuracies
+      • Limited development; marked language difficulties
+      
+      **SCORE 1 (Weak)**
+      • Provides little or no meaningful response
+      • Minimal content from source materials
+      • Serious language difficulties
+      
+      **SCORE 0**
+      • Merely copies from source, in language other than English, off-topic, or blank
+      
+      **EVALUATION CRITERIA FOR INTEGRATED WRITING**:
+      1. **Accuracy**: Correctly identify and explain main points from lecture
+      2. **Completeness**: Include all major points (typically 3 key points)
+      3. **Relationship**: Clearly explain how lecture relates to/challenges reading
+      4. **Organization**: Logical structure with clear connections
+      5. **Language**: Grammar and vocabulary adequate to convey meaning
+      6. **Objectivity**: No personal opinion (summary only)
+      ` : `
+      **INDEPENDENT WRITING TASK RUBRIC**:
+      
+      **SCORE 5 (High)**
+      • Effectively addresses topic and task
+      • Well organized and well developed; appropriate reasons, examples, details
+      • Displays unity, progression, coherence
+      • Displays consistent facility in language use
+      • Minor lexical or grammatical errors
+      
+      **SCORE 4 (Good)**
+      • Generally addresses topic/task; task may be somewhat developed
+      • Generally well organized and developed; reasons/examples may lack detail
+      • Displays unity and progression
+      • Some variety in sentence structure and range of vocabulary
+      • Occasional noticeable minor language errors
+      
+      **SCORE 3 (Fair)**
+      • Addresses topic/task with some development
+      • Display of organization or connection of ideas
+      • May demonstrate inconsistent facility with complex structures
+      • Inappropriate word choice or word form; accumulation of errors
+      
+      **SCORE 2 (Limited)**
+      • Limited development of topic
+      • Inadequate organization/connection of ideas
+      • Limited range of vocabulary or frequent errors
+      • Errors that obscure meaning
+      
+      **SCORE 1 (Weak)**
+      • Seriously limited in development or lacks substance
+      • Little organization
+      • Serious and frequent errors in grammar/usage
+      • Difficult to understand
+      
+      **SCORE 0**
+      • Merely copies the prompt, in language other than English, off-topic, or blank
+      
+      **EVALUATION CRITERIA FOR INDEPENDENT WRITING**:
+      1. **Thesis**: Clear position stated in introduction
+      2. **Development**: Well-developed ideas with specific examples and details (minimum 300 words)
+      3. **Organization**: Clear structure (intro, body paragraphs, conclusion); logical flow
+      4. **Coherence**: Effective use of transitions; unity and progression of ideas
+      5. **Language Use**: Variety in sentence structures; appropriate and accurate vocabulary
+      6. **Grammar**: Grammatical accuracy; errors do not interfere with meaning
+      `}
+      
+      **SOURCE MATERIALS FOR THIS RESPONSE**:
+      - Reading Passage: ${task.reading || "N/A"}
+      - Listening Transcript: ${task.listeningTranscript || "N/A"}
+      
+      **USER'S ESSAY**:
+      "${userResponse}"
+      
+      **Word Count**: ${userResponse.split(/\s+/).length} words ${!isIntegrated ? '(minimum 300 recommended)' : '(150-225 recommended)'}
+      
+      **OUTPUT REQUIREMENTS**:
+      1. **Score**: Integer from 0-5 based on official rubric
+      2. **Feedback**: Comprehensive Japanese feedback (Start DIRECTLY with content, NO greeting phrases)
+      
+      **FEEDBACK STRUCTURE** (in Japanese):
+      
+      ## 📊 総合評価
+      [Overall score and justification based on rubric level]
+      
+      ## 📝 評価項目別の分析
+      
+      ${isIntegrated ? `
+      ### 1. 情報の正確性 (Accuracy)
+      [Are main points from lecture correctly identified?]
+      
+      ### 2. 内容の完全性 (Completeness)
+      [Are all major points included? Any omissions?]
+      
+      ### 3. Reading-Listening関係の説明 (Relationship)
+      [How well is the relationship explained?]
+      
+      ### 4. 構成 (Organization)
+      [Logical structure? Clear transitions?]
+      
+      ### 5. 言語使用 (Language)
+      [Grammar and vocabulary evaluation]
+      ` : `
+      ### 1. 論点の明確性 (Thesis)
+      [Is there a clear position/thesis statement?]
+      
+      ### 2. 内容の展開 (Development)
+      [Quality and quantity of supporting details and examples]
+      [Word count assessment]
+      
+      ### 3. 構成 (Organization)
+      [Intro-Body-Conclusion structure]
+      [Paragraph organization]
+      
+      ### 4. 一貫性 (Coherence)
+      [Use of transitions]
+      [Unity and logical flow]
+      
+      ### 5. 言語使用 (Language)
+      [Sentence variety]
+      [Vocabulary range and accuracy]
+      [Grammatical accuracy]
+      `}
+      
+      ## ✅ 良かった点
+      [2-3 specific strengths with examples from essay]
+      
+      ## 📝 改善が必要な点
+      [2-3 specific weaknesses with examples]
+      [Specific error corrections with explanations]
+      
+      ## 🚀 スコアアップのための具体的アドバイス
+      ${isIntegrated ? `
+      - テンプレート活用: "The reading passage discusses... The lecturer challenges this by..."
+      - 3つの主要ポイントを明確に
+      - 個人的な意見は不要（客観的要約のみ）
+      - パラフレーズを使い、直接コピーしない
+      ` : `
+      - より具体的な例や詳細を追加
+      - トピックセンテンスを各段落に
+      - 接続詞を効果的に使う（However, Furthermore, In addition, etc.）
+      - 文の多様性を高める（simple, compound, complex sentences）
+      - 最低300語を目指す
+      `}
     `;
 
     const response = await ai.models.generateContent({
@@ -541,29 +693,98 @@ export const gradeWritingResponse = async (task: WritingTask, userResponse: stri
 
 export const gradeSpeakingResponse = async (task: SpeakingTask, transcript: string): Promise<{ score: number, feedback: string }> => {
      const prompt = `
-      Act as a certified TOEFL iBT Speaking Rater.
+      Act as a certified TOEFL iBT Speaking Rater using the OFFICIAL ETS TOEFL Scoring Rubric.
       
-      **Task**: ${task.type}
+      **Task Type**: ${task.type}
       **Prompt**: ${task.prompt}
       
-      **Rubric Criteria**:
-      1. **Delivery**: Flow, pacing, pronunciation (simulated check), natural pauses.
-      2. **Language Use**: Grammar, effective vocab.
-      3. **Topic Development**: Did they answer the prompt? Did they use details from the sources?
+      **OFFICIAL TOEFL iBT SPEAKING RUBRIC (0-4 Scale)**:
       
-      **Advice Style**:
-      - Base advice on top strategies (e.g., TST Prep/Juva style).
-      - Did they use a clear template? (e.g., "The reading states... The professor disagrees...")
-      - Did they use transition words?
+      **SCORE 4 (Advanced)**
+      • Delivery: Generally clear, fluid speech; good pronunciation; natural pacing; minor lapses do not affect overall intelligibility
+      • Language Use: Effective use of grammar and vocabulary; displays sustained control of complex structures; minor errors do not obscure meaning
+      • Topic Development: Response fully addresses the task; ideas are well developed and coherent; relationships between ideas are clear; use all or most of the time allowed
       
-      **Context**:
-      - Reading: ${task.reading || "N/A"}
-      - Listening: ${task.listeningTranscript || "N/A"}
-      - User Speech Transcript: "${transcript}"
+      **SCORE 3 (Good)**
+      • Delivery: Speech generally clear with some fluidity; some minor pronunciation, intonation, or pacing issues; overall intelligibility not significantly affected
+      • Language Use: Fairly automatic and effective use of grammar and vocabulary; range may be limited; errors do not seriously interfere with communication
+      • Topic Development: Response generally addresses the task; ideas fairly well developed and coherent; relationships between ideas generally clear but may be incomplete or unclear in places
       
-      **Output**:
-      1. Estimated Score (0-4).
-      2. Actionable Feedback in Japanese (Start DIRECTLY with feedback content, NO greeting phrases like "はい、承知しました。").
+      **SCORE 2 (Fair)**
+      • Delivery: Speech clear at times but with problems with pronunciation, intonation, or pacing; may require some listener effort
+      • Language Use: Limited range and control of grammar and vocabulary; errors may obscure meaning at times
+      • Topic Development: Response addresses task but development is limited; relationships between ideas may be unclear; may not use full time
+      
+      **SCORE 1 (Limited)**
+      • Delivery: Consistent pronunciation, stress, and intonation difficulties; speech choppy or fragmented; significant listener effort required
+      • Language Use: Very limited range and control of grammar and vocabulary; errors frequently obscure meaning
+      • Topic Development: Limited relevant content; unclear connections between ideas; may fail to complete task
+      
+      **SCORE 0 (Weak)**
+      • No response, only repeats prompt, off-topic, or in a language other than English
+      
+      **EVALUATION DIMENSIONS**:
+      1. **Delivery** (発音・流暢さ):
+         - Pronunciation clarity (individual sounds, word stress)
+         - Natural pacing and rhythm
+         - Fluency and smooth transitions
+         - Intonation patterns
+      
+      2. **Language Use** (文法・語彙):
+         - Grammatical accuracy and range (simple vs complex structures)
+         - Vocabulary appropriateness and precision
+         - Use of idiomatic expressions
+         - Error frequency and impact on meaning
+      
+      3. **Topic Development** (内容の展開):
+         - Completeness: Fully addresses all parts of the question
+         - Coherence: Logical flow and organization of ideas
+         - Detail: Appropriate examples and supporting information
+         - ${task.type === 'INTEGRATED' ? 'Synthesis: Accurate integration of reading/listening content' : 'Reasoning: Clear explanations and justifications'}
+         - Time management: Uses most/all of allowed time effectively
+      
+      **CONTEXT FOR THIS RESPONSE**:
+      - Reading Material: ${task.reading || "N/A"}
+      - Listening Transcript: ${task.listeningTranscript || "N/A"}
+      - User's Speech Transcript: "${transcript}"
+      
+      **OUTPUT REQUIREMENTS**:
+      1. **Score**: Integer from 0-4 based on official rubric
+      2. **Feedback**: Comprehensive Japanese feedback (Start DIRECTLY with content, NO greeting phrases)
+      
+      **FEEDBACK STRUCTURE** (in Japanese):
+      
+      ## 📊 総合評価
+      [Overall assessment and score justification]
+      
+      ## 🎯 各評価項目の分析
+      
+      ### 1. Delivery (発音・流暢さ)
+      [Specific comments on pronunciation, pacing, fluency]
+      [Score level for this dimension: 1-4]
+      
+      ### 2. Language Use (文法・語彙)
+      [Specific comments on grammar and vocabulary]
+      [Notable errors and suggestions]
+      [Score level for this dimension: 1-4]
+      
+      ### 3. Topic Development (内容の展開)
+      [Completeness of response]
+      [Quality of examples/details]
+      [Organization and coherence]
+      [Score level for this dimension: 1-4]
+      
+      ## ✅ 良かった点
+      [2-3 specific strengths]
+      
+      ## 📝 改善点
+      [2-3 specific areas for improvement with examples]
+      
+      ## 🚀 スコアアップのための具体的アドバイス
+      [Actionable tips based on official TOEFL strategies]
+      ${task.type === 'INTEGRATED' ? '- テンプレート例: "The reading passage states that... However, the professor argues that..."' : '- 個人的な経験を具体的に述べる'}
+      - 時間管理のコツ
+      - よく使える表現やフレーズ
     `;
 
     const response = await ai.models.generateContent({
