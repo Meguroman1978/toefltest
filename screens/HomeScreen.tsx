@@ -364,7 +364,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, isLoading }) => {
                           </h3>
                       </div>
                       
-                      <div className="bg-indigo-50/50 rounded-xl border border-indigo-100 p-6 flex-1 overflow-y-auto custom-scroll shadow-inner">
+                      <div className="bg-indigo-50/50 rounded-xl border border-indigo-100 p-6 flex-1 min-h-0 overflow-hidden shadow-inner flex flex-col">
                           {!historyAnalysis && !isAnalyzingHistory && (
                               <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
                                   <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm text-indigo-200 text-3xl">
@@ -393,8 +393,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, isLoading }) => {
                           )}
 
                           {historyAnalysis && (
-                              <div className="prose prose-sm prose-indigo max-w-none text-slate-700 leading-relaxed whitespace-pre-wrap">
-                                  {historyAnalysis}
+                              <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-indigo-300 scrollbar-track-indigo-100">
+                                  <div className="text-slate-700 leading-relaxed whitespace-pre-wrap space-y-4">
+                                      {historyAnalysis}
+                                  </div>
                               </div>
                           )}
                       </div>

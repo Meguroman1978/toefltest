@@ -69,8 +69,10 @@ const FeedbackResultScreen: React.FC<FeedbackResultScreenProps> = ({ score, maxS
             <h2 className={`text-2xl font-bold ${theme.text}`}>Detailed Feedback</h2>
           </div>
           
-          <div className="prose max-w-none text-slate-700 whitespace-pre-wrap leading-relaxed">
-            {feedback}
+          <div className="max-h-96 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-purple-300 scrollbar-track-purple-100">
+            <div className="text-slate-700 whitespace-pre-wrap leading-relaxed space-y-3">
+              {feedback}
+            </div>
           </div>
         </div>
 

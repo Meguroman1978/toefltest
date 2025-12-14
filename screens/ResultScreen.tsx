@@ -293,8 +293,10 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ passage, answers, onHome, l
                   <p className="text-sm">Generating personalized advice...</p>
                 </div>
               ) : (
-                <div className="prose prose-sm max-w-none text-slate-700 whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto custom-scroll">
-                  {analysis}
+                <div className="max-h-64 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-indigo-300 scrollbar-track-indigo-100">
+                  <div className="text-slate-700 whitespace-pre-wrap leading-relaxed space-y-2">
+                    {analysis}
+                  </div>
                 </div>
               )}
             </div>

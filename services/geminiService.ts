@@ -140,7 +140,11 @@ export const generateTOEFLSet = async (topic?: string, isIntensive: boolean = fa
        - Length: Approx 700 words (unless Intensive Mode).
        - Structure: Intro (Thesis) -> Body Paragraphs (Details/Arguments) -> Conclusion.
        - Formatting: **NO HTML**. Use markdown **bold** for vocabulary emphasis.
-       - **INSERT TEXT MARKER**: You MUST insert the marker [■] exactly 4 times within ONE specific paragraph to allow for an "Insert Text" question.
+       - **INSERT TEXT MARKER (ABSOLUTELY REQUIRED)**: You MUST insert the EXACT marker "[■]" (square brackets containing a black square symbol U+25A0) exactly 4 times within ONE specific paragraph.
+         * MANDATORY: Use this EXACT string: [■]
+         * Place at natural sentence boundaries (between sentences)
+         * Example paragraph: "Sentence one.[■] Sentence two here.[■] Another sentence.[■] Final sentence.[■] Conclusion."
+         * This is CRITICAL for the "Insert Text" question to function properly.
 
     2. **QUESTION GENERATION** (10 Questions):
        - Questions must follow the TPO order: Vocabulary -> Detail/Factual -> Negative Factual -> Inference -> Rhetorical Purpose -> Sentence Simplification -> Insert Text -> Prose Summary.
