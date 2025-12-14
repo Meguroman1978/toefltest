@@ -180,128 +180,109 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, onShowPastReports, isL
         
         {/* Left Side: Dashboard */}
         <div className="bg-slate-100 border-r border-slate-200" style={{ width: '33.333%', display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-          <div className="flex items-center gap-3 px-6 py-6 flex-shrink-0 border-b border-slate-200">
-             <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg text-white">
+          <div className="flex items-center gap-2 px-4 py-3 flex-shrink-0 border-b border-slate-200">
+             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-sm">
                <i className="fas fa-graduation-cap"></i>
              </div>
-             <span className="font-extrabold text-xl tracking-wide text-slate-800">TOEFL<span className="text-indigo-600">AI</span></span>
+             <span className="font-extrabold text-lg tracking-wide text-slate-800">TOEFL<span className="text-indigo-600">AI</span></span>
           </div>
 
-          <div className="sidebar-scroll space-y-3 px-6 py-4" style={{ flex: '1 1 auto', overflowY: 'scroll', overflowX: 'hidden' }}>
-             <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Test Modes</div>
+          <div className="sidebar-scroll space-y-1.5 px-4 py-3" style={{ flex: '1 1 auto', overflowY: 'auto', overflowX: 'hidden' }}>
+             <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Test Modes</div>
              
-             <button onClick={() => { setMode('READING'); setShowHistory(false); }} className={`w-full p-4 rounded-xl text-left transition-all flex items-center gap-3 ${mode === 'READING' ? 'bg-white shadow-md border-l-4 border-indigo-600' : 'hover:bg-white/50'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${mode === 'READING' ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-200 text-slate-500'}`}><i className="fas fa-book"></i></div>
-                <div>
-                    <div className="font-bold text-slate-800">Reading</div>
-                    <div className="text-xs text-slate-500">TPO Style Passages</div>
-                </div>
+             <button onClick={() => { setMode('READING'); setShowHistory(false); }} className={`w-full p-2 rounded-lg text-left transition-all flex items-center gap-2 ${mode === 'READING' ? 'bg-white shadow-sm border-l-2 border-indigo-600' : 'hover:bg-white/50'}`}>
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${mode === 'READING' ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-200 text-slate-500'}`}><i className="fas fa-book"></i></div>
+                <div className="text-xs font-semibold text-slate-800">Reading</div>
              </button>
              
-             <button onClick={() => { setMode('LISTENING'); setShowHistory(false); }} className={`w-full p-4 rounded-xl text-left transition-all flex items-center gap-3 ${mode === 'LISTENING' ? 'bg-white shadow-md border-l-4 border-sky-500' : 'hover:bg-white/50'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${mode === 'LISTENING' ? 'bg-sky-100 text-sky-600' : 'bg-slate-200 text-slate-500'}`}><i className="fas fa-headphones"></i></div>
-                <div>
-                    <div className="font-bold text-slate-800">Listening</div>
-                    <div className="text-xs text-slate-500">Conversations & Lectures</div>
-                </div>
+             <button onClick={() => { setMode('LISTENING'); setShowHistory(false); }} className={`w-full p-2 rounded-lg text-left transition-all flex items-center gap-2 ${mode === 'LISTENING' ? 'bg-white shadow-sm border-l-2 border-sky-500' : 'hover:bg-white/50'}`}>
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${mode === 'LISTENING' ? 'bg-sky-100 text-sky-600' : 'bg-slate-200 text-slate-500'}`}><i className="fas fa-headphones"></i></div>
+                <div className="text-xs font-semibold text-slate-800">Listening</div>
              </button>
              
-             <button onClick={() => { setMode('SPEAKING'); setShowHistory(false); }} className={`w-full p-4 rounded-xl text-left transition-all flex items-center gap-3 ${mode === 'SPEAKING' ? 'bg-white shadow-md border-l-4 border-orange-500' : 'hover:bg-white/50'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${mode === 'SPEAKING' ? 'bg-orange-100 text-orange-600' : 'bg-slate-200 text-slate-500'}`}><i className="fas fa-microphone"></i></div>
-                <div>
-                    <div className="font-bold text-slate-800">Speaking</div>
-                    <div className="text-xs text-slate-500">AI Graded Tasks</div>
-                </div>
+             <button onClick={() => { setMode('SPEAKING'); setShowHistory(false); }} className={`w-full p-2 rounded-lg text-left transition-all flex items-center gap-2 ${mode === 'SPEAKING' ? 'bg-white shadow-sm border-l-2 border-orange-500' : 'hover:bg-white/50'}`}>
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${mode === 'SPEAKING' ? 'bg-orange-100 text-orange-600' : 'bg-slate-200 text-slate-500'}`}><i className="fas fa-microphone"></i></div>
+                <div className="text-xs font-semibold text-slate-800">Speaking</div>
              </button>
 
-             <button onClick={() => { setMode('WRITING'); setShowHistory(false); }} className={`w-full p-4 rounded-xl text-left transition-all flex items-center gap-3 ${mode === 'WRITING' ? 'bg-white shadow-md border-l-4 border-purple-600' : 'hover:bg-white/50'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${mode === 'WRITING' ? 'bg-purple-100 text-purple-600' : 'bg-slate-200 text-slate-500'}`}><i className="fas fa-pen-nib"></i></div>
-                <div>
-                    <div className="font-bold text-slate-800">Writing</div>
-                    <div className="text-xs text-slate-500">Integrated & Discussion</div>
-                </div>
+             <button onClick={() => { setMode('WRITING'); setShowHistory(false); }} className={`w-full p-2 rounded-lg text-left transition-all flex items-center gap-2 ${mode === 'WRITING' ? 'bg-white shadow-sm border-l-2 border-purple-600' : 'hover:bg-white/50'}`}>
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${mode === 'WRITING' ? 'bg-purple-100 text-purple-600' : 'bg-slate-200 text-slate-500'}`}><i className="fas fa-pen-nib"></i></div>
+                <div className="text-xs font-semibold text-slate-800">Writing</div>
              </button>
              
-             {/* Full Test Button - Highlighted */}
-             <div className="pt-4 border-t-2 border-slate-300 mt-4">
+             {/* Full Test Button - Compact */}
+             <div className="pt-2 border-t border-slate-300 mt-2">
                <button 
                  onClick={() => { 
                    if (window.confirm("Full Test を開始しますか？\n\n全4セクション（Reading, Listening, Speaking, Writing）を順番に受験し、最後に総合スコアレポートが表示されます。\n\n所要時間: 約2時間")) {
                      onStart('', 'FULL_TEST' as TestMode); 
                    }
                  }} 
-                 className="w-full p-4 rounded-xl text-left transition-all flex items-center gap-3 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 shadow-lg transform hover:scale-105"
+                 className="w-full p-2.5 rounded-lg text-left transition-all flex items-center gap-2 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 shadow-md"
                >
-                 <div className="w-8 h-8 rounded-full flex items-center justify-center bg-white text-red-600">
+                 <div className="w-6 h-6 rounded-full flex items-center justify-center bg-white text-red-600 text-xs">
                    <i className="fas fa-trophy"></i>
                  </div>
-                 <div>
-                   <div className="font-bold text-white">Full Test</div>
-                   <div className="text-xs text-white/90">Complete TOEFL Exam</div>
-                 </div>
-                 <i className="fas fa-arrow-circle-right text-white text-xl ml-auto"></i>
+                 <div className="text-xs font-bold text-white">Full Test</div>
+                 <i className="fas fa-arrow-circle-right text-white text-sm ml-auto"></i>
                </button>
              </div>
 
-             <div className="pt-4 mt-2 border-t border-slate-200 space-y-2">
-                <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Tools</span>
-                </div>
+             <div className="pt-2 mt-1 border-t border-slate-200 space-y-1.5">
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tools</div>
 
                 <button 
                     onClick={() => { setShowVocabBook(true); setShowHistory(false); setShowSettings(false); }}
-                    className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold transition-colors flex justify-center items-center gap-2"
+                    className="w-full py-2 px-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1.5"
                 >
-                    <i className="fas fa-book"></i> 単語・熟語帳
+                    <i className="fas fa-book text-xs"></i> <span>単語・熟語帳</span>
                 </button>
 
                 <button 
                     onClick={() => { setMode('VOCAB_LESSON'); setShowHistory(false); }}
-                    className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors flex justify-center items-center gap-2"
+                    className="w-full py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1.5"
                 >
-                    <i className="fas fa-spell-check"></i> 単語・熟語特訓
+                    <i className="fas fa-spell-check text-xs"></i> <span>単語・熟語特訓</span>
                 </button>
 
                 <button 
                     onClick={() => { setMode('GRAMMAR' as TestMode); setShowHistory(false); }}
-                    className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-bold transition-colors flex justify-center items-center gap-2"
+                    className="w-full py-2 px-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1.5"
                 >
-                    <i className="fas fa-language"></i> 文法特訓
+                    <i className="fas fa-language text-xs"></i> <span>文法特訓</span>
                 </button>
 
                 <button 
                     onClick={() => { setShowHistory(!showHistory); setShowSettings(false); setShowVocabBook(false); }}
-                    className="w-full py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold transition-colors flex justify-center items-center gap-2"
+                    className="w-full py-2 px-3 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1.5"
                 >
-                    <i className="fas fa-chart-bar"></i> 過去の分野別正解率
+                    <i className="fas fa-chart-bar text-xs"></i> <span>過去の正解率</span>
                 </button>
                 
                 <button 
                     onClick={onShowPastReports}
-                    className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs font-bold transition-colors flex justify-center items-center gap-2"
+                    className="w-full py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1.5"
                 >
-                    <i className="fas fa-file-alt"></i> 過去のスコアレポート
+                    <i className="fas fa-file-alt text-xs"></i> <span>スコアレポート</span>
                 </button>
              </div>
 
-             {/* Settings Section */}
-             <div className="pt-4 mt-2 border-t-2 border-slate-300 space-y-2">
-                <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Settings</span>
-                </div>
+             {/* Settings Section - Compact */}
+             <div className="pt-2 mt-1 border-t border-slate-300 space-y-1.5">
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Settings</div>
                 
                 <button 
                     onClick={() => { setShowKnowledgeManager(true); setShowHistory(false); setShowSettings(false); setShowVocabBook(false); }}
-                    className="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-lg text-xs font-bold transition-all flex justify-center items-center gap-2 shadow-md"
+                    className="w-full py-2 px-3 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-lg text-[11px] font-bold transition-all flex items-center gap-1.5"
                 >
-                    <i className="fas fa-graduation-cap"></i> Knowledge Base
+                    <i className="fas fa-graduation-cap text-xs"></i> <span>Knowledge Base</span>
                 </button>
 
                 <button 
                     onClick={() => { setShowSettings(true); setShowHistory(false); setShowVocabBook(false); }}
-                    className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold transition-colors flex justify-center items-center gap-2"
+                    className="w-full py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1.5"
                 >
-                    <i className="fas fa-cog"></i> System Setup (Mic/Audio)
+                    <i className="fas fa-cog text-xs"></i> <span>System Setup</span>
                 </button>
              </div>
           </div>
