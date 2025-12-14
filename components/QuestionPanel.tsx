@@ -118,7 +118,7 @@ const QuestionPanel: React.FC<QuestionPanelProps> = ({
                 <div className="mt-4 p-3 bg-blue-100 border-l-4 border-blue-600 rounded">
                   <p className="text-sm text-blue-900 flex items-center gap-2">
                     <i className="fas fa-info-circle"></i>
-                    <span>Click on the <strong>[■]</strong> buttons in the passage to select where this sentence should be inserted.</span>
+                    <span>Click on the <strong>[■]</strong> buttons in the passage (left side) to select where this sentence should be inserted.</span>
                   </p>
                 </div>
             </div>
@@ -156,27 +156,34 @@ const QuestionPanel: React.FC<QuestionPanelProps> = ({
                 </div>
             </div>
 
-            {/* Position Guide */}
+            {/* Interactive Position Selector (Buttons) */}
             <div className="p-4 bg-slate-100 rounded-lg border border-slate-300">
-              <p className="text-sm font-bold text-slate-700 mb-3">Available Positions:</p>
+              <p className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                <i className="fas fa-hand-pointer"></i>
+                Click a position to select it:
+              </p>
               <div className="grid grid-cols-2 gap-2">
                 {positions.map((pos) => (
-                  <div 
+                  <button
                     key={pos.value}
-                    className={`p-3 rounded-lg border-2 transition-all ${
+                    type="button"
+                    onClick={() => {
+                      onAnswerChange([pos.value.toString()]);
+                    }}
+                    className={`p-3 rounded-lg border-2 transition-all cursor-pointer ${
                       selectedIndex === pos.value
-                        ? 'bg-blue-600 border-blue-700 text-white shadow-md'
-                        : 'bg-white border-slate-300 text-slate-700'
+                        ? 'bg-blue-600 border-blue-700 text-white shadow-md scale-105'
+                        : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-blue-400'
                     }`}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 justify-center">
                       <span className="font-bold text-lg">■</span>
                       <span className="text-sm">{pos.label}</span>
                       {selectedIndex === pos.value && (
                         <i className="fas fa-check ml-auto"></i>
                       )}
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
