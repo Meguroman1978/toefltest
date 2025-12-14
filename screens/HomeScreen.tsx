@@ -221,14 +221,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, isLoading }) => {
                 </div>
              </button>
 
-             <button onClick={() => { setMode('VOCAB_LESSON'); setShowHistory(false); }} className={`w-full p-4 rounded-xl text-left transition-all flex items-center gap-3 ${mode === 'VOCAB_LESSON' ? 'bg-white shadow-md border-l-4 border-emerald-600' : 'hover:bg-white/50'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${mode === 'VOCAB_LESSON' ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-500'}`}><i className="fas fa-spell-check text-xs"></i></div>
-                <div>
-                    <div className="font-bold text-slate-800">単語・熟語特訓</div>
-                    <div className="text-xs text-slate-500">Vocabulary Booster</div>
-                </div>
-             </button>
-             
              <div className="pt-4 mt-auto border-t border-slate-200 space-y-2">
                 <div className="flex justify-between items-center mb-1">
                     <span className="text-xs font-bold text-slate-400 uppercase">Tools</span>
@@ -242,10 +234,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, isLoading }) => {
                 </button>
 
                 <button 
-                    onClick={() => { setShowSettings(true); setShowHistory(false); setShowVocabBook(false); }}
-                    className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold transition-colors flex justify-center items-center gap-2"
+                    onClick={() => { setMode('VOCAB_LESSON'); setShowHistory(false); }}
+                    className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors flex justify-center items-center gap-2"
                 >
-                    <i className="fas fa-cog"></i> System Setup (Mic/Audio)
+                    <i className="fas fa-spell-check"></i> 単語・熟語特訓
                 </button>
 
                 <button 
@@ -256,10 +248,24 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, isLoading }) => {
                 </button>
                 
                 <button 
+                    onClick={() => { /* TODO: Show Score Reports */ }}
+                    className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs font-bold transition-colors flex justify-center items-center gap-2"
+                >
+                    <i className="fas fa-file-alt"></i> 過去のスコアレポート
+                </button>
+                
+                <button 
                     onClick={() => { setShowKnowledgeManager(true); setShowHistory(false); setShowSettings(false); setShowVocabBook(false); }}
                     className="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-lg text-xs font-bold transition-all flex justify-center items-center gap-2 shadow-md"
                 >
                     <i className="fas fa-graduation-cap"></i> Knowledge Base
+                </button>
+
+                <button 
+                    onClick={() => { setShowSettings(true); setShowHistory(false); setShowVocabBook(false); }}
+                    className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold transition-colors flex justify-center items-center gap-2"
+                >
+                    <i className="fas fa-cog"></i> System Setup (Mic/Audio)
                 </button>
              </div>
           </div>
