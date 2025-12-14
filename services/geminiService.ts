@@ -1101,7 +1101,17 @@ export const generateGrammarQuestions = async (
       }
     });
 
+    if (!response || !response.text) {
+      console.error('Empty response from Gemini API');
+      throw new Error('APIからの応答が空です');
+    }
+
     const data = JSON.parse(response.text);
+    
+    if (!data.questions || !Array.isArray(data.questions)) {
+      console.error('Invalid response format:', data);
+      throw new Error('応答フォーマットが不正です');
+    }
     
     // Transform to GrammarQuestion format
     const questions = data.questions.map((q: any, idx: number) => ({
@@ -1119,6 +1129,9 @@ export const generateGrammarQuestions = async (
     return questions;
   } catch (error) {
     console.error('Grammar generation error:', error);
+    if (error instanceof Error) {
+      throw new Error(`文法問題の生成に失敗しました: ${error.message}`);
+    }
     throw new Error('文法問題の生成に失敗しました');
   }
 };
