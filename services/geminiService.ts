@@ -211,34 +211,71 @@ export const generateListeningSet = async (): Promise<ListeningSet> => {
 export const generateSpeakingTask = async (): Promise<SpeakingTask> => {
     const taskTypeRoll = Math.random();
     let promptText = "";
+    let questionType: string | undefined = undefined;
     
     // Weighted selection for variety
-    if (taskTypeRoll < 0.25) promptText = "Generate Task 1 (Independent): Choice or Agree/Disagree.";
-    else if (taskTypeRoll < 0.5) promptText = "Generate Task 2 (Campus Situation): University Announcement (Reading) + Student Conversation (Listening).";
-    else if (taskTypeRoll < 0.75) promptText = "Generate Task 3 (Academic Concept): General Concept (Reading) + Specific Example (Listening).";
-    else promptText = "Generate Task 4 (Academic Lecture): Summary of a lecture topic.";
+    if (taskTypeRoll < 0.5) {
+        // Independent Task (50% chance) - Randomly select one of 5 types
+        const independentTypes = [
+            { type: 'AGREE_DISAGREE', example: 'Do you agree or disagree that students should bring their cellphones to school?' },
+            { type: 'PREFERENCE', example: 'Would you prefer to have a higher-paying job with longer hours or a lower-paying job with shorter hours?' },
+            { type: 'HYPOTHETICAL', example: 'If your friends from another country are going to visit your country, where do you suggest they go?' },
+            { type: 'OPINION', example: 'Do you think bicycles will still be widely used in the future or replaced by other means of transportation?' },
+            { type: 'DESCRIBE', example: 'Describe the most impressive moment in your life.' }
+        ];
+        
+        const selectedType = independentTypes[Math.floor(Math.random() * independentTypes.length)];
+        questionType = selectedType.type;
+        promptText = `Generate Task 1 (Independent - ${selectedType.type}): Create a question similar to "${selectedType.example}"`;
+    } else if (taskTypeRoll < 0.65) {
+        promptText = "Generate Task 2 (Campus Situation): University Announcement (Reading) + Student Conversation (Listening).";
+    } else if (taskTypeRoll < 0.8) {
+        promptText = "Generate Task 3 (Academic Concept): General Concept (Reading) + Specific Example (Listening).";
+    } else {
+        promptText = "Generate Task 4 (Academic Lecture): Summary of a lecture topic.";
+    }
 
     const systemInstruction = `
        Generate a TOEFL Speaking Task conforming to ETS Standards.
        
-       **Task 1 (Independent)**:
-       - Prompt: "Some people prefer X, others prefer Y. Which do you prefer?" or "Do you agree or disagree...?"
-       - Prep: 15s, Speak: 45s.
+       **Task 1 (Independent) - 5 Question Types**:
+       
+       1. **AGREE_DISAGREE**: Present a statement and ask for agreement/disagreement.
+          - Example: "Do you agree or disagree that students should bring their cellphones to school?"
+          - Format: Clear yes/no stance with 2-3 supporting reasons
+       
+       2. **PREFERENCE**: Present two options and ask for preference.
+          - Example: "Would you prefer to have a higher-paying job with longer hours or a lower-paying job with shorter hours?"
+          - Format: State preference clearly, explain advantages/disadvantages
+       
+       3. **HYPOTHETICAL**: Present a hypothetical situation and ask for suggestions.
+          - Example: "If your friends from another country are going to visit your country, where do you suggest they go?"
+          - Format: Give specific suggestions with reasons
+       
+       4. **OPINION**: Ask for opinion on a future trend or general topic.
+          - Example: "Do you think bicycles will still be widely used in the future or replaced by other means of transportation?"
+          - Format: State opinion with supporting evidence or predictions
+       
+       5. **DESCRIBE**: Ask to describe a personal experience or memory.
+          - Example: "Describe the most impressive moment in your life."
+          - Format: Narrative structure with details and emotions
+       
+       - Prep: 15s, Speak: 45s for all Independent tasks.
        
        **Task 2 (Integrated - Campus)**:
        - Reading: A university announcement proposing a CHANGE.
-       - Listening (Transcript): Two students discussion. One explicitly AGREES or DISAGREES.
+       - Listening (Transcript): Two students discussion. Format as "Student 1: [text]\\nStudent 2: [text]" for multi-speaker TTS.
        - **Japanese Listening Transcript**: Provide a Japanese translation of the conversation.
        - Prompt: "The woman/man expresses his/her opinion. State the opinion and the reasons given."
        
        **Task 3 (Integrated - Academic)**:
        - Reading: Define an academic concept.
-       - Listening (Transcript): Professor gives a specific EXAMPLE illustrating the concept.
+       - Listening (Transcript): "Professor: [text]" format for TTS. Professor gives a specific EXAMPLE illustrating the concept.
        - **Japanese Listening Transcript**: Provide a Japanese translation of the lecture.
        - Prompt: "Describe the concept of X and how the professor's example illustrates it."
        
        **Task 4 (Integrated - Lecture)**:
-       - Listening (Transcript): Professor discusses a topic with TWO distinct examples.
+       - Listening (Transcript): "Professor: [text]" format. Professor discusses a topic with TWO distinct examples.
        - **Japanese Listening Transcript**: Provide a Japanese translation of the lecture.
        - Prompt: "Using points and examples from the lecture, explain..."
     `;
@@ -256,6 +293,7 @@ export const generateSpeakingTask = async (): Promise<SpeakingTask> => {
     const data = JSON.parse(response.text!);
     return {
         id: `speaking_${Date.now()}`,
+        questionType: questionType as any,
         ...data
     };
 }
@@ -441,6 +479,9 @@ export const generateHistoryAnalysis = async (history: PerformanceRecord[]): Pro
         'Speaking': {},
         'Writing': {}
     };
+    
+    // 2. Track Speaking question types separately
+    const speakingTypes: Record<string, { correct: number, total: number }> = {};
 
     history.forEach(record => {
         let mainSection = 'Reading'; // Default
@@ -453,12 +494,33 @@ export const generateHistoryAnalysis = async (history: PerformanceRecord[]): Pro
         }
         sections[mainSection][record.category].correct += record.correct;
         sections[mainSection][record.category].total += record.total;
+        
+        // Track Speaking question types
+        if (mainSection === 'Speaking' && record.questionType) {
+            const qType = record.questionType;
+            if (!speakingTypes[qType]) {
+                speakingTypes[qType] = { correct: 0, total: 0 };
+            }
+            speakingTypes[qType].correct += record.correct;
+            speakingTypes[qType].total += record.total;
+        }
     });
 
     const prompt = `
         You are an elite TOEFL Tutor. Analyze the student's performance history data below.
         
+        **Overall Performance Data:**
         ${JSON.stringify(sections, null, 2)}
+        
+        **Speaking Question Type Breakdown:**
+        ${JSON.stringify(speakingTypes, null, 2)}
+        
+        Question Type Meanings:
+        - AGREE_DISAGREE: 賛成/反対 (e.g., "Do you agree or disagree that...")
+        - PREFERENCE: 2択 (e.g., "Would you prefer A or B?")
+        - HYPOTHETICAL: 仮定 (e.g., "If your friends visit, where would you suggest?")
+        - OPINION: 自由意見 (e.g., "Do you think X will happen in the future?")
+        - DESCRIBE: 描写 (e.g., "Describe the most impressive moment...")
         
         Provide a **Comprehensive Performance Report in Japanese** using standard Markdown.
         
@@ -470,9 +532,16 @@ export const generateHistoryAnalysis = async (history: PerformanceRecord[]): Pro
         ## [Icon] [Section Name] Section
         ### 📉 弱点と傾向 (Weakness Analysis)
         - Analyze the sub-categories or scores.
-        - Explain *why* the student might be failing (e.g., "Inference questions require understanding implied meaning...").
+        - **For Speaking Section**: Analyze performance by question type (AGREE_DISAGREE, PREFERENCE, etc.)
+        - Explain *why* the student might be failing (e.g., "AGREE_DISAGREE questions require clear thesis statement...").
         ### 🚀 具体的対策 (Actionable Training)
         - Provide specific exercises (e.g., "Shadowing for Listening", "Template usage for Speaking").
+        - **For Speaking Section**: Provide type-specific strategies:
+          - AGREE_DISAGREE: テンプレート「I strongly agree/disagree because...」
+          - PREFERENCE: 比較対照テクニック
+          - HYPOTHETICAL: 具体的な提案と理由
+          - OPINION: 根拠と予測の組み合わせ
+          - DESCRIBE: 時系列・感情の描写
         
         ---
         

@@ -45,9 +45,17 @@ export interface ListeningSet {
   questions: Question[];
 }
 
+export type SpeakingQuestionType = 
+  | 'AGREE_DISAGREE'      // ①賛成/反対
+  | 'PREFERENCE'          // ②2択
+  | 'HYPOTHETICAL'        // ③仮定
+  | 'OPINION'             // ④自由意見
+  | 'DESCRIBE';           // ⑤描写
+
 export interface SpeakingTask {
   id: string;
   type: 'INDEPENDENT' | 'INTEGRATED';
+  questionType?: SpeakingQuestionType; // NEW: Specific question type for Independent tasks
   prompt: string;
   reading?: string; // For Integrated
   listeningTranscript?: string; // For Integrated
@@ -72,6 +80,7 @@ export interface PerformanceRecord {
   category: string;
   correct: number; // Score or Correct Count
   total: number; // Max Score or Total Count
+  questionType?: SpeakingQuestionType; // For Speaking tasks only
 }
 
 export interface GeneratedContent {

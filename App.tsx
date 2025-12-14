@@ -219,7 +219,8 @@ const App: React.FC = () => {
           date: new Date().toISOString(),
           category: 'Speaking',
           correct: score,
-          total: 4
+          total: 4,
+          questionType: speakingTask?.questionType  // Include question type
       };
       const existing = localStorage.getItem('toefl_history');
       const parsedExisting = existing ? JSON.parse(existing) : [];
