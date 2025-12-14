@@ -1,0 +1,7 @@
+{
+  "name": "TOEFL AI Simulator",
+  "description": "An AI-powered TOEFL Reading practice application that generates unlimited TPO-style passages and questions using Google Gemini.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
