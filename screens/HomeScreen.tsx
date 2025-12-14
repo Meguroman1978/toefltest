@@ -244,7 +244,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, isLoading }) => {
 
              <div className="pt-4 mt-2 border-t border-slate-200 space-y-2">
                 <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs font-bold text-slate-400 uppercase">Tools</span>
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Tools</span>
                 </div>
 
                 <button 
@@ -274,6 +274,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, isLoading }) => {
                 >
                     <i className="fas fa-file-alt"></i> 過去のスコアレポート
                 </button>
+             </div>
+
+             {/* Settings Section */}
+             <div className="pt-4 mt-2 border-t-2 border-slate-300 space-y-2">
+                <div className="flex justify-between items-center mb-1">
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Settings</span>
+                </div>
                 
                 <button 
                     onClick={() => { setShowKnowledgeManager(true); setShowHistory(false); setShowSettings(false); setShowVocabBook(false); }}
