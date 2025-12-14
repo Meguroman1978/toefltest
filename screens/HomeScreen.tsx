@@ -3,6 +3,7 @@ import { TestMode, PerformanceRecord } from '../types';
 import { speakText, stopAudio } from '../utils/audio';
 import { generateHistoryAnalysis } from '../services/geminiService';
 import VocabBookScreen from './VocabBookScreen';
+import KnowledgeUpdateScreen from './KnowledgeUpdateScreen';
 
 interface HomeScreenProps {
   onStart: (topic: string, mode: TestMode, isIntensive?: boolean, weakCat?: string) => void;
@@ -14,7 +15,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, isLoading }) => {
   const [mode, setMode] = useState<TestMode>('READING');
   const [showHistory, setShowHistory] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [showVocabBook, setShowVocabBook] = useState(false); 
+  const [showVocabBook, setShowVocabBook] = useState(false);
+  const [showKnowledgeManager, setShowKnowledgeManager] = useState(false); 
   const [history, setHistory] = useState<PerformanceRecord[]>([]);
   
   // History Analysis State
@@ -168,6 +170,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, isLoading }) => {
   return (
     <>
       {showVocabBook && <VocabBookScreen onClose={() => setShowVocabBook(false)} />}
+      {showKnowledgeManager && <KnowledgeUpdateScreen onClose={() => setShowKnowledgeManager(false)} />}
       
       <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-slate-900 to-black flex items-center justify-center p-4 relative overflow-hidden font-sans">
         <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none"></div>
@@ -250,6 +253,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, isLoading }) => {
                     className="w-full py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold transition-colors flex justify-center items-center gap-2"
                 >
                     <i className="fas fa-chart-bar"></i> 過去の分野別正解率
+                </button>
+                
+                <button 
+                    onClick={() => { setShowKnowledgeManager(true); setShowHistory(false); setShowSettings(false); setShowVocabBook(false); }}
+                    className="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-lg text-xs font-bold transition-all flex justify-center items-center gap-2 shadow-md"
+                >
+                    <i className="fas fa-graduation-cap"></i> Knowledge Base
                 </button>
              </div>
           </div>

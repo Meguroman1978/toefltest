@@ -1,5 +1,17 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { GeneratedContent, Passage, WritingTask, ListeningSet, SpeakingTask, QuestionType, PerformanceRecord } from "../types";
+import { 
+  createQuestionFingerprint, 
+  isQuestionDuplicate, 
+  addQuestionToHistory,
+  getUnderusedTopics,
+  needsCleanup,
+  cleanupHistory 
+} from "./questionHistory";
+import { 
+  loadKnowledgeBase, 
+  needsUpdate as kbNeedsUpdate 
+} from "./youtubeAnalyzer";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 const MODEL_NAME = "gemini-2.0-flash";
@@ -90,6 +102,26 @@ const writingResponseSchema: Schema = {
 // --- GENERATORS ---
 
 export const generateTOEFLSet = async (topic?: string, isIntensive: boolean = false, weakCategory?: string): Promise<GeneratedContent> => {
+  // Cleanup history if needed
+  if (needsCleanup()) {
+    cleanupHistory();
+  }
+
+  // Load knowledge base for enhanced strategies
+  const kb = loadKnowledgeBase();
+  const kbStrategies = kb?.reading.strategies.slice(0, 5).join('\n- ') || '';
+  const kbTips = kb?.reading.tips.slice(0, 5).join('\n- ') || '';
+
+  // If no topic specified, suggest underused topics
+  if (!topic) {
+    const allTopics = ['Biology', 'History', 'Art', 'Geology', 'Astronomy', 'Archaeology', 'Psychology', 'Economics', 'Environmental Science', 'Literature'];
+    const underused = getUnderusedTopics('Reading', allTopics);
+    if (underused.length > 0) {
+      topic = underused[Math.floor(Math.random() * underused.length)];
+      console.log(`Selected underused topic for variety: ${topic}`);
+    }
+  }
+
   let userPrompt = topic 
     ? `Generate a TOEFL Reading passage about "${topic}".`
     : `Generate a TOEFL Reading passage on a random academic topic (Biology, History, Art, or Geology).`;
@@ -100,6 +132,8 @@ export const generateTOEFLSet = async (topic?: string, isIntensive: boolean = fa
 
   const systemInstruction = `
     You are an expert TOEFL test content generator, simulating ETS TPO (Test Practice Online) standards.
+    
+    ${kb && kbStrategies ? `**EXPERT STRATEGIES (from YouTube instructors)**:\n- ${kbStrategies}\n` : ''}
     
     1. **PASSAGE CREATION**:
        - Tone: Strictly Academic, University Textbook style.
@@ -127,10 +161,42 @@ export const generateTOEFLSet = async (topic?: string, isIntensive: boolean = fa
        - **Vocabulary**: Provide 4 options. 1 synonym (correct), 3 distractors.
 
     4. **TIPS & STRATEGY (Based on Top Instructors)**:
+       ${kb && kbTips ? `- ${kbTips}\n` : ''}
        - Provide tips in the style of top TOEFL instructors (like TST Prep or Juva).
        - Focus on: "Elimination strategy", "Identifying extreme words (always, never)", and "Finding the keyword connection".
   `;
 
+  // Generate with retry logic for duplicates
+  let attempts = 0;
+  const maxAttempts = 3;
+
+  while (attempts < maxAttempts) {
+    const response = await ai.models.generateContent({
+      model: MODEL_NAME,
+      contents: userPrompt,
+      config: {
+        systemInstruction,
+        responseMimeType: "application/json",
+        responseSchema: readingResponseSchema,
+        temperature: 0.3 + (attempts * 0.2), // Increase randomness on retry
+      },
+    });
+
+    const content = JSON.parse(response.text!) as GeneratedContent;
+    
+    // Check for duplicates
+    const fingerprint = createQuestionFingerprint('Reading', content);
+    if (!isQuestionDuplicate(fingerprint)) {
+      // Save to history
+      addQuestionToHistory(fingerprint);
+      return content;
+    }
+
+    console.warn(`Duplicate detected on attempt ${attempts + 1}, regenerating...`);
+    attempts++;
+  }
+
+  // If all attempts failed, return anyway but log warning
   const response = await ai.models.generateContent({
     model: MODEL_NAME,
     contents: userPrompt,
@@ -138,11 +204,16 @@ export const generateTOEFLSet = async (topic?: string, isIntensive: boolean = fa
       systemInstruction,
       responseMimeType: "application/json",
       responseSchema: readingResponseSchema,
-      temperature: 0.3, 
+      temperature: 0.8, // High randomness
     },
   });
 
-  return JSON.parse(response.text!) as GeneratedContent;
+  const content = JSON.parse(response.text!) as GeneratedContent;
+  const fingerprint = createQuestionFingerprint('Reading', content);
+  addQuestionToHistory(fingerprint);
+  
+  console.warn('Generated content may be similar to previous questions');
+  return content;
 };
 
 export const generateListeningSet = async (): Promise<ListeningSet> => {
