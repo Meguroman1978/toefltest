@@ -220,8 +220,29 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, isLoading }) => {
                     <div className="text-xs text-slate-500">Integrated & Discussion</div>
                 </div>
              </button>
+             
+             {/* Full Test Button - Highlighted */}
+             <div className="pt-4 border-t-2 border-slate-300 mt-4">
+               <button 
+                 onClick={() => { 
+                   if (window.confirm("Full Test を開始しますか？\n\n全4セクション（Reading, Listening, Speaking, Writing）を順番に受験し、最後に総合スコアレポートが表示されます。\n\n所要時間: 約2時間")) {
+                     onStart('', 'FULL_TEST' as TestMode); 
+                   }
+                 }} 
+                 className="w-full p-4 rounded-xl text-left transition-all flex items-center gap-3 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 shadow-lg transform hover:scale-105"
+               >
+                 <div className="w-8 h-8 rounded-full flex items-center justify-center bg-white text-red-600">
+                   <i className="fas fa-trophy"></i>
+                 </div>
+                 <div>
+                   <div className="font-bold text-white">Full Test</div>
+                   <div className="text-xs text-white/90">Complete TOEFL Exam</div>
+                 </div>
+                 <i className="fas fa-arrow-circle-right text-white text-xl ml-auto"></i>
+               </button>
+             </div>
 
-             <div className="pt-4 mt-auto border-t border-slate-200 space-y-2">
+             <div className="pt-4 mt-2 border-t border-slate-200 space-y-2">
                 <div className="flex justify-between items-center mb-1">
                     <span className="text-xs font-bold text-slate-400 uppercase">Tools</span>
                 </div>

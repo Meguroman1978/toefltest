@@ -4,7 +4,7 @@ export enum QuestionType {
   PROSE_SUMMARY = 'PROSE_SUMMARY',
 }
 
-export type TestMode = 'READING' | 'LISTENING' | 'SPEAKING' | 'WRITING' | 'VOCAB_LESSON';
+export type TestMode = 'READING' | 'LISTENING' | 'SPEAKING' | 'WRITING' | 'VOCAB_LESSON' | 'FULL_TEST';
 
 export interface Option {
   id: string;
