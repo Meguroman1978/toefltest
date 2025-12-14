@@ -13,7 +13,7 @@ import {
   needsUpdate as kbNeedsUpdate 
 } from "./youtubeAnalyzer";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: "AIzaSyBoK-kckzwlPkmusNv3_sFL2GtBkxoQ0xA" });
 const MODEL_NAME = "gemini-2.0-flash";
 
 // --- SCHEMAS ---
