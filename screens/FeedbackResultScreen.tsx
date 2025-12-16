@@ -1,5 +1,6 @@
 import React from 'react';
 import { WritingTask, SpeakingTask } from '../types';
+import { formatMarkdownToReact } from '../utils/formatText';
 
 interface FeedbackResultScreenProps {
   score: number;
@@ -101,8 +102,8 @@ const FeedbackResultScreen: React.FC<FeedbackResultScreenProps> = ({ score, maxS
           </div>
           
           <div className="max-h-96 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-purple-300 scrollbar-track-purple-100">
-            <div className="text-slate-700 whitespace-pre-wrap leading-relaxed space-y-3">
-              {feedback}
+            <div className="text-slate-700 leading-relaxed">
+              {formatMarkdownToReact(feedback)}
             </div>
           </div>
         </div>

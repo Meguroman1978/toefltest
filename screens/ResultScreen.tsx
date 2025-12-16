@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Passage, QuestionType, ListeningSet } from '../types';
 import { generatePerformanceAnalysis, generateContextExamples } from '../services/geminiService';
 import { speakText, stopAudio } from '../utils/audio';
+import { formatMarkdownToReact } from '../utils/formatText';
 
 interface ResultScreenProps {
   passage: Passage;
@@ -309,8 +310,8 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ passage, answers, onHome, l
                 </div>
               ) : (
                 <div className="max-h-96 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-indigo-300 scrollbar-track-indigo-100">
-                  <div className="text-slate-700 whitespace-pre-wrap leading-relaxed space-y-2">
-                    {analysis}
+                  <div className="text-slate-700 leading-relaxed">
+                    {analysis && formatMarkdownToReact(analysis)}
                   </div>
                 </div>
               )}

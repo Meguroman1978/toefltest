@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ScoreReport } from '../types';
+import { formatMarkdownToReact } from '../utils/formatText';
 
 interface PastScoreReportsScreenProps {
   onHome: () => void;
@@ -64,23 +65,23 @@ const PastScoreReportsScreen: React.FC<PastScoreReportsScreenProps> = ({ onHome,
     const trends = calculateTrends();
 
     let analysisText = `## 📊 過去のスコアデータ分析\n\n`;
-    analysisText += `受講回数: **${reports.length}回**\n\n`;
+    analysisText += `受講回数: ${reports.length}回\n\n`;
 
     analysisText += `### 平均スコア\n`;
-    analysisText += `- 総合: **${averages.total}** / 120\n`;
-    analysisText += `- Reading: **${averages.reading}** / 30\n`;
-    analysisText += `- Listening: **${averages.listening}** / 30\n`;
-    analysisText += `- Speaking: **${averages.speaking}** / 30\n`;
-    analysisText += `- Writing: **${averages.writing}** / 30\n\n`;
+    analysisText += `- 総合: ${averages.total} / 120\n`;
+    analysisText += `- Reading: ${averages.reading} / 30\n`;
+    analysisText += `- Listening: ${averages.listening} / 30\n`;
+    analysisText += `- Speaking: ${averages.speaking} / 30\n`;
+    analysisText += `- Writing: ${averages.writing} / 30\n\n`;
 
     if (trends) {
       analysisText += `### 📈 成長トレンド (最新 vs 最古)\n`;
       const formatTrend = (val: number) => val > 0 ? `+${val}` : `${val}`;
-      analysisText += `- 総合: **${formatTrend(trends.total)}** 点\n`;
-      analysisText += `- Reading: **${formatTrend(trends.reading)}** 点\n`;
-      analysisText += `- Listening: **${formatTrend(trends.listening)}** 点\n`;
-      analysisText += `- Speaking: **${formatTrend(trends.speaking)}** 点\n`;
-      analysisText += `- Writing: **${formatTrend(trends.writing)}** 点\n\n`;
+      analysisText += `- 総合: ${formatTrend(trends.total)} 点\n`;
+      analysisText += `- Reading: ${formatTrend(trends.reading)} 点\n`;
+      analysisText += `- Listening: ${formatTrend(trends.listening)} 点\n`;
+      analysisText += `- Speaking: ${formatTrend(trends.speaking)} 点\n`;
+      analysisText += `- Writing: ${formatTrend(trends.writing)} 点\n\n`;
     }
 
     // Find strongest and weakest sections
@@ -94,7 +95,7 @@ const PastScoreReportsScreen: React.FC<PastScoreReportsScreenProps> = ({ onHome,
     scores.sort((a, b) => b.score - a.score);
 
     analysisText += `### 💪 現在の強み\n`;
-    analysisText += `最も優れているセクションは **${scores[0].name}** (${scores[0].score}/30) です。\n`;
+    analysisText += `最も優れているセクションは ${scores[0].name} (${scores[0].score}/30) です。\n`;
     if (scores[0].score >= 24) {
       analysisText += `これは「Advanced」レベルで、非常に優れた成績です。この強みを維持しましょう。\n\n`;
     } else if (scores[0].score >= 18) {
@@ -104,34 +105,34 @@ const PastScoreReportsScreen: React.FC<PastScoreReportsScreenProps> = ({ onHome,
     }
 
     analysisText += `### 📝 改善が必要なセクション\n`;
-    analysisText += `最も改善が必要なセクションは **${scores[3].name}** (${scores[3].score}/30) です。\n`;
+    analysisText += `最も改善が必要なセクションは ${scores[3].name} (${scores[3].score}/30) です。\n`;
     
     if (scores[3].name === 'Reading') {
-      analysisText += `\n**Reading改善のための対策:**\n`;
+      analysisText += `\n#### Reading改善のための対策\n`;
       analysisText += `- 毎日15-20分の学術的な英文記事を読む習慣をつける\n`;
       analysisText += `- 段落の要約練習を行い、主旨を素早く掴む訓練をする\n`;
       analysisText += `- Vocabulary Bookで単語力を強化する\n`;
     } else if (scores[3].name === 'Listening') {
-      analysisText += `\n**Listening改善のための対策:**\n`;
+      analysisText += `\n#### Listening改善のための対策\n`;
       analysisText += `- TED Talksや学術講義を聴いてノートテイキングの練習をする\n`;
       analysisText += `- シャドーイング練習で音声認識力を向上させる\n`;
       analysisText += `- 会話の流れとキーポイントを意識して聴く習慣をつける\n`;
     } else if (scores[3].name === 'Speaking') {
-      analysisText += `\n**Speaking改善のための対策:**\n`;
+      analysisText += `\n#### Speaking改善のための対策\n`;
       analysisText += `- 毎日3-5分の英語での自己録音練習を行う\n`;
       analysisText += `- 様々なトピックについて15秒で意見をまとめる訓練をする\n`;
       analysisText += `- 発音とイントネーションを意識して練習する\n`;
     } else if (scores[3].name === 'Writing') {
-      analysisText += `\n**Writing改善のための対策:**\n`;
+      analysisText += `\n#### Writing改善のための対策\n`;
       analysisText += `- エッセイの構造（Introduction-Body-Conclusion）を意識する\n`;
       analysisText += `- 毎日1つのトピックについて200-300語のエッセイを書く\n`;
       analysisText += `- 文法の正確性と語彙の多様性を重視する\n`;
     }
 
     analysisText += `\n### 🎯 今後の学習計画\n`;
-    analysisText += `1. **短期目標 (1-2週間)**: ${scores[3].name}セクションに集中し、スコアを+3点上げることを目指す\n`;
-    analysisText += `2. **中期目標 (1ヶ月)**: すべてのセクションで平均20点以上を達成する\n`;
-    analysisText += `3. **長期目標 (3ヶ月)**: 総合スコア100点突破を目指す\n\n`;
+    analysisText += `1. 短期目標 (1-2週間): ${scores[3].name}セクションに集中し、スコアを+3点上げることを目指す\n`;
+    analysisText += `2. 中期目標 (1ヶ月): すべてのセクションで平均20点以上を達成する\n`;
+    analysisText += `3. 長期目標 (3ヶ月): 総合スコア100点突破を目指す\n\n`;
     
     analysisText += `定期的にFull Testを受講して、進捗を確認しましょう。頑張ってください！ 🚀`;
 
@@ -325,21 +326,9 @@ const PastScoreReportsScreen: React.FC<PastScoreReportsScreenProps> = ({ onHome,
               <p className="text-xs text-slate-600 mt-2">分析中...</p>
             </div>
           ) : (
-            <div className="prose prose-slate max-w-none max-h-[400px] overflow-y-auto pr-2 custom-scroll">
-              <div className="whitespace-pre-wrap text-slate-700 text-[10px] leading-relaxed">
-                {analysis.split('\n').map((line, index) => {
-                  if (line.startsWith('## ')) {
-                    return <h2 key={index} className="text-xs font-bold text-slate-800 mt-2 mb-1">{line.substring(3)}</h2>;
-                  } else if (line.startsWith('### ')) {
-                    return <h3 key={index} className="text-[11px] font-bold text-slate-700 mt-2 mb-1">{line.substring(4)}</h3>;
-                  } else if (line.startsWith('- ')) {
-                    return <li key={index} className="ml-4 mb-1 text-[10px]">{line.substring(2)}</li>;
-                  } else if (line.trim() === '') {
-                    return <br key={index} />;
-                  } else {
-                    return <p key={index} className="mb-1">{line}</p>;
-                  }
-                })}
+            <div className="max-w-none max-h-[400px] overflow-y-auto pr-2 custom-scroll">
+              <div className="text-[10px] leading-relaxed">
+                {formatMarkdownToReact(analysis)}
               </div>
             </div>
           )}
