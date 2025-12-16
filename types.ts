@@ -112,6 +112,7 @@ export interface SectionReport {
   correctAnswers: number;
   totalQuestions: number;
   timeSpent: number; // in seconds
+  maxTime?: number; // maximum allowed time in seconds (for Full Test)
   breakdown: CategoryBreakdown[];
 }
 
