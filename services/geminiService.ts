@@ -13,10 +13,28 @@ import {
   needsUpdate as kbNeedsUpdate 
 } from "./youtubeAnalyzer";
 
-// ⚠️ SECURITY NOTE: API Key is embedded here for deployment
-// This file should NOT be committed with the actual API key
-// Before committing, replace with a placeholder or use git update-index --assume-unchanged
-const ai = new GoogleGenAI({ apiKey: "AIzaSyAsnYCSVZC_n09CT7p7O5BCHSHQg8j-_xM" });
+// API Key management - stored in localStorage
+const getApiKey = (): string | null => {
+  return localStorage.getItem('GEMINI_API_KEY');
+};
+
+export const setApiKey = (key: string): void => {
+  localStorage.setItem('GEMINI_API_KEY', key);
+};
+
+export const hasApiKey = (): boolean => {
+  const key = getApiKey();
+  return key !== null && key.trim().length > 0;
+};
+
+const getAIClient = () => {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    throw new Error('API Key not set. Please configure your Gemini API Key in Settings.');
+  }
+  return new GoogleGenAI({ apiKey });
+};
+
 const MODEL_NAME = "gemini-2.0-flash";
 
 // --- SCHEMAS ---
@@ -178,7 +196,7 @@ export const generateTOEFLSet = async (topic?: string, isIntensive: boolean = fa
   const maxAttempts = 3;
 
   while (attempts < maxAttempts) {
-    const response = await ai.models.generateContent({
+    const response = await getAIClient().models.generateContent({
       model: MODEL_NAME,
       contents: userPrompt,
       config: {
@@ -204,7 +222,7 @@ export const generateTOEFLSet = async (topic?: string, isIntensive: boolean = fa
   }
 
   // If all attempts failed, return anyway but log warning
-  const response = await ai.models.generateContent({
+  const response = await getAIClient().models.generateContent({
     model: MODEL_NAME,
     contents: userPrompt,
     config: {
@@ -246,7 +264,7 @@ export const generateListeningSet = async (): Promise<ListeningSet> => {
       - **Strategy Tips**: Reference "Signal Words" (e.g., "Listen for 'However' as it indicates a shift") and "Note-taking" (e.g., "Focus on the cause-and-effect relationship mentioned here").
     `;
 
-    const response = await ai.models.generateContent({
+    const response = await getAIClient().models.generateContent({
         model: MODEL_NAME,
         contents: prompt,
         config: {
@@ -358,7 +376,7 @@ export const generateSpeakingTask = async (): Promise<SpeakingTask> => {
        - Prompt: "Using points and examples from the lecture, explain..."
     `;
 
-    const response = await ai.models.generateContent({
+    const response = await getAIClient().models.generateContent({
         model: MODEL_NAME,
         contents: promptText,
         config: {
@@ -399,7 +417,7 @@ export const generateWritingTask = async (): Promise<WritingTask> => {
     - **Question**: "Write a post responding to the professor's question. In your response, you should express and support your opinion and contribute to the discussion."
   `;
 
-  const response = await ai.models.generateContent({
+  const response = await getAIClient().models.generateContent({
     model: MODEL_NAME,
     contents: prompt,
     config: {
@@ -420,7 +438,7 @@ export const generateVocabLesson = async (): Promise<GeneratedContent> => {
       Category Label: "語彙・熟語特訓".
     `;
 
-    const response = await ai.models.generateContent({
+    const response = await getAIClient().models.generateContent({
         model: MODEL_NAME,
         contents: prompt,
         config: {
@@ -469,7 +487,7 @@ Generate 4 example sentences for the word/phrase "${word}" (meaning: ${definitio
 Respond in JSON format with keys: academic, daily, business, political
 `;
 
-    const response = await ai.models.generateContent({
+    const response = await getAIClient().models.generateContent({
         model: MODEL_NAME,
         contents: prompt,
         config: {
@@ -658,7 +676,7 @@ export const gradeWritingResponse = async (task: WritingTask, userResponse: stri
       `}
     `;
 
-    const response = await ai.models.generateContent({
+    const response = await getAIClient().models.generateContent({
         model: MODEL_NAME,
         contents: prompt,
         config: {
@@ -790,7 +808,7 @@ export const gradeSpeakingResponse = async (task: SpeakingTask, transcript: stri
       - よく使える表現やフレーズ
     `;
 
-    const response = await ai.models.generateContent({
+    const response = await getAIClient().models.generateContent({
         model: MODEL_NAME,
         contents: prompt,
         config: {
@@ -847,7 +865,7 @@ export const generatePerformanceAnalysis = async (
     3. **Actionable Advice**: Specific study tips based on the missed questions.
   `;
 
-  const response = await ai.models.generateContent({
+  const response = await getAIClient().models.generateContent({
     model: MODEL_NAME,
     contents: prompt,
   });
@@ -951,7 +969,7 @@ export const generateHistoryAnalysis = async (history: PerformanceRecord[]): Pro
         - 3 key takeaways for the next test.
     `;
 
-    const response = await ai.models.generateContent({
+    const response = await getAIClient().models.generateContent({
         model: MODEL_NAME,
         contents: prompt,
     });
@@ -1092,7 +1110,7 @@ export const generateGrammarQuestions = async (
   `;
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await getAIClient().models.generateContent({
       model: MODEL_NAME,
       contents: prompt,
       config: {

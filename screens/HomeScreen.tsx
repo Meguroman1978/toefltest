@@ -8,10 +8,11 @@ import KnowledgeUpdateScreen from './KnowledgeUpdateScreen';
 interface HomeScreenProps {
   onStart: (topic: string, mode: TestMode, isIntensive?: boolean, weakCat?: string) => void;
   onShowPastReports: () => void;
+  onShowSettings: () => void;
   isLoading: boolean;
 }
 
-const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, onShowPastReports, isLoading }) => {
+const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, onShowPastReports, onShowSettings, isLoading }) => {
   const [topic, setTopic] = useState('');
   const [mode, setMode] = useState<TestMode>('READING');
   const [showHistory, setShowHistory] = useState(false);
@@ -270,6 +271,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onStart, onShowPastReports, isL
              {/* Settings Section - Compact */}
              <div className="pt-2 mt-1 border-t border-slate-300 space-y-1.5">
                 <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Settings</div>
+                
+                <button 
+                    onClick={onShowSettings}
+                    className="w-full py-2 px-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg text-[11px] font-bold transition-all flex items-center gap-1.5"
+                >
+                    <i className="fas fa-key text-xs"></i> <span>API Key 設定</span>
+                </button>
                 
                 <button 
                     onClick={() => { setShowKnowledgeManager(true); setShowHistory(false); setShowSettings(false); setShowVocabBook(false); }}
