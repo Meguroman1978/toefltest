@@ -80,7 +80,7 @@ const GrammarTestScreen: React.FC<GrammarTestScreenProps> = ({
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
       {/* Header */}
-      <div className={`bg-${color}-600 text-white p-6 shadow-lg`}>
+      <div className={`bg-${color}-600 text-white p-6 shadow-lg sticky top-0 z-10`}>
         <div className="max-w-5xl mx-auto">
           <div className="flex justify-between items-center mb-4">
             <div>

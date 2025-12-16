@@ -205,14 +205,15 @@ const FullTestScreen: React.FC<FullTestScreenProps> = ({ onComplete, onExit }) =
               <button
                 onClick={() => {
                   // Here we would trigger the actual test for this section
-                  // For now, simulate completion
+                  // For now, simulate completion with accurate time tracking
+                  const actualTimeSpent = Math.floor((Date.now() - sectionStartTime) / 1000);
                   const mockReport: SectionReport = {
                     score: 25,
                     maxScore: 30,
                     rawScore: 8,
                     correctAnswers: 8,
                     totalQuestions: 10,
-                    timeSpent: 0,
+                    timeSpent: actualTimeSpent, // Use actual time spent
                     breakdown: []
                   };
                   handleSectionComplete(mockReport);

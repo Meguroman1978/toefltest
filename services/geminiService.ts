@@ -1066,14 +1066,27 @@ export const generateGrammarQuestions = async (
     required: ['questions']
   };
 
+  // Generate random seed for variety
+  const randomSeed = Math.random().toString(36).substring(7);
+  const timestamp = Date.now();
+  
   const prompt = `
-    Generate ${count} grammar questions based on Cambridge Grammar principles.
+    Generate ${count} UNIQUE grammar questions based on Cambridge Grammar principles.
     Level: ${level}
+    Random Seed: ${randomSeed}
+    Timestamp: ${timestamp}
     
     Grammar Points to Cover:
     ${selectedPoints.map((p, i) => `${i + 1}. ${p}`).join('\n')}
     
     Reference Book: ${bookReference[level]}
+    
+    **CRITICAL: ENSURE VARIETY AND UNIQUENESS**
+    - Use DIFFERENT contexts and scenarios for each question
+    - Vary the vocabulary and sentence structures
+    - Create FRESH examples that haven't been used before
+    - Use diverse topics: technology, travel, education, sports, daily life, business, etc.
+    - Avoid repetitive patterns
     
     **REQUIREMENTS:**
     1. Each question should test ONE specific grammar point
@@ -1107,6 +1120,7 @@ export const generateGrammarQuestions = async (
     - Sentence transformation
     
     Make questions progressively challenging within the ${level} level.
+    Remember: Each question must be UNIQUE with DIFFERENT content and context!
   `;
 
   try {
