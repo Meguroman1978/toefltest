@@ -28,7 +28,9 @@ const FullTestScreen: React.FC<FullTestScreenProps> = ({ onComplete, onExit }) =
 
   const handleSectionComplete = (report: SectionReport) => {
     const timeSpent = Math.floor((Date.now() - sectionStartTime) / 1000);
-    const updatedReport = { ...report, timeSpent };
+    const currentSectionInfo = sections.find(s => s.name === currentSection);
+    const maxTime = currentSectionInfo ? currentSectionInfo.duration * 60 : 0; // Convert minutes to seconds
+    const updatedReport = { ...report, timeSpent, maxTime };
     
     const newScores = {
       ...sectionScores,

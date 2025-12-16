@@ -134,8 +134,21 @@ export const generateTOEFLSet = async (topic?: string, isIntensive: boolean = fa
   const kbTips = kb?.reading.tips.slice(0, 5).join('\n- ') || '';
 
   // If no topic specified, suggest underused topics
+  const subtopics = {
+    'Biology': ['marine ecosystems', 'cellular biology', 'evolutionary adaptation', 'neuroscience', 'ecology'],
+    'History': ['ancient civilizations', 'industrial revolution', 'cultural movements', 'colonialism', 'technological innovation'],
+    'Art': ['impressionism', 'renaissance', 'modern art', 'sculpture techniques', 'art restoration'],
+    'Geology': ['plate tectonics', 'mineral formation', 'volcanic activity', 'sedimentary processes', 'erosion'],
+    'Astronomy': ['stellar evolution', 'planetary formation', 'dark matter', 'cosmic radiation', 'exoplanets'],
+    'Archaeology': ['excavation methods', 'carbon dating', 'ancient artifacts', 'settlement patterns', 'cultural preservation'],
+    'Psychology': ['cognitive development', 'behavioral psychology', 'memory formation', 'social psychology', 'neuropsychology'],
+    'Economics': ['market dynamics', 'trade theory', 'monetary policy', 'economic growth', 'global economics'],
+    'Environmental Science': ['climate change', 'renewable energy', 'conservation biology', 'pollution control', 'sustainable development'],
+    'Literature': ['literary movements', 'narrative techniques', 'poetry analysis', 'comparative literature', 'literary criticism']
+  };
+  
   if (!topic) {
-    const allTopics = ['Biology', 'History', 'Art', 'Geology', 'Astronomy', 'Archaeology', 'Psychology', 'Economics', 'Environmental Science', 'Literature'];
+    const allTopics = Object.keys(subtopics);
     const underused = getUnderusedTopics('Reading', allTopics);
     if (underused.length > 0) {
       topic = underused[Math.floor(Math.random() * underused.length)];
@@ -143,9 +156,16 @@ export const generateTOEFLSet = async (topic?: string, isIntensive: boolean = fa
     }
   }
 
+  // Add specific subtopic for more variety
+  const specificSubtopic = topic && subtopics[topic as keyof typeof subtopics] 
+    ? subtopics[topic as keyof typeof subtopics][Math.floor(Math.random() * 5)]
+    : null;
+  
+  const randomVariation = Math.random().toString(36).substring(7); // Add randomness
+  
   let userPrompt = topic 
-    ? `Generate a TOEFL Reading passage about "${topic}".`
-    : `Generate a TOEFL Reading passage on a random academic topic (Biology, History, Art, or Geology).`;
+    ? `Generate a UNIQUE TOEFL Reading passage about "${topic}"${specificSubtopic ? ` focusing on ${specificSubtopic}` : ''}. Variation ID: ${randomVariation}. IMPORTANT: Create a completely original passage with fresh vocabulary, examples, and perspectives. Avoid common patterns.`
+    : `Generate a TOEFL Reading passage on a random academic topic (Biology, History, Art, or Geology). Variation ID: ${randomVariation}.`;
 
   if (isIntensive && weakCategory) {
     userPrompt = `INTENSIVE TRAINING MODE. Generate a shorter passage (3-4 paragraphs) but create questions focused specifically on "${weakCategory}" (e.g. Inference, Vocabulary, Insert Text).`;
@@ -1069,6 +1089,8 @@ export const generateGrammarQuestions = async (
   // Generate random seed for variety
   const randomSeed = Math.random().toString(36).substring(7);
   const timestamp = Date.now();
+  const contexts = ['technology', 'travel', 'education', 'sports', 'daily life', 'business', 'health', 'entertainment', 'science', 'environment'];
+  const shuffledContexts = contexts.sort(() => Math.random() - 0.5).slice(0, count);
   
   const prompt = `
     Generate ${count} UNIQUE grammar questions based on Cambridge Grammar principles.
@@ -1081,12 +1103,16 @@ export const generateGrammarQuestions = async (
     
     Reference Book: ${bookReference[level]}
     
+    **MANDATORY CONTEXT DIVERSITY** - Use these specific contexts for each question:
+    ${shuffledContexts.map((ctx, i) => `Question ${i + 1}: Context must be about "${ctx}"`).join('\n')}
+    
     **CRITICAL: ENSURE VARIETY AND UNIQUENESS**
-    - Use DIFFERENT contexts and scenarios for each question
-    - Vary the vocabulary and sentence structures
-    - Create FRESH examples that haven't been used before
-    - Use diverse topics: technology, travel, education, sports, daily life, business, etc.
-    - Avoid repetitive patterns
+    - Each question MUST use a DIFFERENT context from the list above
+    - Use DIFFERENT sentence structures and vocabulary for each question
+    - Create FRESH, UNIQUE examples that avoid common patterns
+    - Vary question formats: fill-in-blank, error correction, transformation, multiple choice
+    - Use diverse scenarios within each context
+    - NEVER repeat similar sentence patterns or vocabulary across questions
     
     **REQUIREMENTS:**
     1. Each question should test ONE specific grammar point

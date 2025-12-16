@@ -9,7 +9,7 @@ interface ScoreReportScreenProps {
 
 const ScoreReportScreen: React.FC<ScoreReportScreenProps> = ({ report, onHome, onBackToReports }) => {
   // Use real profile photos from provided images
-  // We use a deterministic selection based on report ID to ensure the same photo appears for the same report
+  // Select a random photo each time the score report is displayed
   const profilePhotos = [
     'https://www.genspark.ai/api/files/s/RkniAVJj',
     'https://www.genspark.ai/api/files/s/ILmU31a1',
@@ -17,9 +17,10 @@ const ScoreReportScreen: React.FC<ScoreReportScreenProps> = ({ report, onHome, o
     'https://www.genspark.ai/api/files/s/fDzupcx5',
     'https://www.genspark.ai/api/files/s/AdHqekhL'
   ];
-  // Use report ID to deterministically select a photo (same report = same photo)
-  const photoIndex = report.id ? parseInt(report.id.replace(/\D/g, '')) % profilePhotos.length : Math.floor(Math.random() * profilePhotos.length);
-  const profilePhotoUrl = profilePhotos[photoIndex];
+  // Random selection - different image each time
+  const [profilePhotoUrl] = React.useState(() => 
+    profilePhotos[Math.floor(Math.random() * profilePhotos.length)]
+  );
   
   const getScoreColor = (score: number) => {
     if (score >= 24) return 'text-green-600';
@@ -245,8 +246,13 @@ const ScoreReportScreen: React.FC<ScoreReportScreenProps> = ({ report, onHome, o
                   <div className="text-center mt-1">
                     <div className="text-sm font-bold text-slate-700">
                       {Math.floor(section.data.timeSpent / 60)}:{String(section.data.timeSpent % 60).padStart(2, '0')}
+                      {section.data.maxTime && (
+                        <span className="text-[10px] text-slate-500">
+                          /{Math.floor(section.data.maxTime / 60)}:{String(section.data.maxTime % 60).padStart(2, '0')}
+                        </span>
+                      )}
                     </div>
-                    <p className="text-[9px] text-slate-500">Time</p>
+                    <p className="text-[9px] text-slate-500">Time{section.data.maxTime ? ' Used/Max' : ''}</p>
                   </div>
                 </div>
               </div>
