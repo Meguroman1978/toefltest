@@ -19,6 +19,7 @@ COPY . .
 ARG GEMINI_API_KEY
 ENV GEMINI_API_KEY=${GEMINI_API_KEY}
 
+# Force cache invalidation - Version: 2025-12-16-v2
 RUN npm run build
 
 # ========================================
