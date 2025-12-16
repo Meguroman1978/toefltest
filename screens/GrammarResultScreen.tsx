@@ -62,8 +62,8 @@ const GrammarResultScreen: React.FC<GrammarResultScreenProps> = ({
   }, {} as Record<string, { correct: number; total: number }>);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8 overflow-y-auto">
+      <div className="max-w-5xl mx-auto pb-8">
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 text-center">
           <div className="text-6xl mb-4">{performance.icon}</div>
