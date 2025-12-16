@@ -95,6 +95,7 @@ const FullTestScreen: React.FC<FullTestScreenProps> = ({ onComplete, onExit }) =
     correctAnswers: 0,
     totalQuestions: 0,
     timeSpent: 0,
+    maxTime: 0,
     breakdown: []
   });
 
@@ -209,6 +210,8 @@ const FullTestScreen: React.FC<FullTestScreenProps> = ({ onComplete, onExit }) =
                   // Here we would trigger the actual test for this section
                   // For now, simulate completion with accurate time tracking
                   const actualTimeSpent = Math.floor((Date.now() - sectionStartTime) / 1000);
+                  const currentSectionInfo = sections.find(s => s.name === currentSection);
+                  const maxTimeAllowed = currentSectionInfo ? currentSectionInfo.duration * 60 : 0;
                   const mockReport: SectionReport = {
                     score: 25,
                     maxScore: 30,
@@ -216,6 +219,7 @@ const FullTestScreen: React.FC<FullTestScreenProps> = ({ onComplete, onExit }) =
                     correctAnswers: 8,
                     totalQuestions: 10,
                     timeSpent: actualTimeSpent, // Use actual time spent
+                    maxTime: maxTimeAllowed, // Add max allowed time
                     breakdown: []
                   };
                   handleSectionComplete(mockReport);

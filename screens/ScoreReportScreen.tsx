@@ -275,11 +275,38 @@ const ScoreReportScreen: React.FC<ScoreReportScreenProps> = ({ report, onHome, o
                 <i className="fas fa-check-circle"></i> Strengths
               </h4>
               <ul className="space-y-1 text-[9px] text-slate-700">
-                {report.readingScore >= report.listeningScore && report.readingScore >= report.speakingScore && report.readingScore >= report.writingScore && (
-                  <li>• Reading is strongest</li>
-                )}
-                {report.totalScore >= 90 && <li>• Excellent overall</li>}
-                {report.totalScore >= 60 && report.totalScore < 90 && <li>• Solid foundation</li>}
+                {(() => {
+                  const strengths = [];
+                  const maxScore = Math.max(report.readingScore, report.listeningScore, report.speakingScore, report.writingScore);
+                  
+                  // Identify strongest section(s)
+                  if (report.readingScore === maxScore && report.readingScore >= 20) {
+                    strengths.push(<li key="reading">• Reading is strongest</li>);
+                  }
+                  if (report.listeningScore === maxScore && report.listeningScore >= 20) {
+                    strengths.push(<li key="listening">• Listening is strongest</li>);
+                  }
+                  if (report.speakingScore === maxScore && report.speakingScore >= 20) {
+                    strengths.push(<li key="speaking">• Speaking is strongest</li>);
+                  }
+                  if (report.writingScore === maxScore && report.writingScore >= 20) {
+                    strengths.push(<li key="writing">• Writing is strongest</li>);
+                  }
+                  
+                  // Overall performance
+                  if (report.totalScore >= 90) {
+                    strengths.push(<li key="excellent">• Excellent overall performance</li>);
+                  } else if (report.totalScore >= 60) {
+                    strengths.push(<li key="solid">• Solid foundation</li>);
+                  }
+                  
+                  // If no strengths identified
+                  if (strengths.length === 0) {
+                    return <li className="text-slate-500 italic">Continue practicing to build strengths</li>;
+                  }
+                  
+                  return strengths;
+                })()}
               </ul>
             </div>
 

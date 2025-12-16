@@ -240,6 +240,7 @@ const App: React.FC = () => {
                 correctAnswers: correctCount,
                 totalQuestions: passage.questions.length,
                 timeSpent: 0,
+                maxTime: 35 * 60, // 35 minutes in seconds
                 breakdown: []
             };
             setFullTestScores(prev => ({ ...prev, reading: sectionReport }));
@@ -291,6 +292,7 @@ const App: React.FC = () => {
                   correctAnswers: correctCount,
                   totalQuestions: listeningSet.questions.length,
                   timeSpent: 0,
+                  maxTime: 36 * 60, // 36 minutes in seconds
                   breakdown: []
               };
               setFullTestScores(prev => ({ ...prev, listening: sectionReport }));
@@ -337,6 +339,7 @@ const App: React.FC = () => {
               correctAnswers: score,
               totalQuestions: 4,
               timeSpent: 0,
+              maxTime: 16 * 60, // 16 minutes in seconds
               breakdown: []
           };
           setFullTestScores(prev => ({ ...prev, speaking: sectionReport }));
@@ -374,6 +377,7 @@ const App: React.FC = () => {
              correctAnswers: score,
              totalQuestions: 1,
              timeSpent: 0,
+             maxTime: 29 * 60, // 29 minutes in seconds
              breakdown: []
          };
          const finalScores = { ...fullTestScores, writing: sectionReport };
@@ -426,6 +430,7 @@ const App: React.FC = () => {
       correctAnswers: 0,
       totalQuestions: 0,
       timeSpent: 0,
+      maxTime: 0,
       breakdown: []
   });
 
